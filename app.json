@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "sesco-app",
+    "slug": "sesco-app-react-native",
+    "version": "1.0.0",
+    "assetBundlePatterns": ["**/*"]
+  },
+  "name": "sesco-app"
+}
