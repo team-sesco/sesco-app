@@ -1,15 +1,11 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Main from "./Main";
+import Main from "../screens/Main";
 import Stack from "./Stack";
-import {
-  Octicons,
-  MaterialCommunityIcons,
-  FontAwesome5,
-} from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
 import styled from "styled-components/native";
-import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import Login from "../screens/Login/Login";
 
 const HeaderLeftLogo = styled.Text`
   font-size: 30px;
@@ -31,7 +27,7 @@ const Root = () => {
   const goToSearch = () => {
     //@ts-ignore
     navigation.navigate("Stack", {
-      screen: "DetectPest",
+      screen: "Login",
     });
   };
   const HeaderRightBtns = () => (
@@ -63,11 +59,17 @@ const Root = () => {
       }}
     >
       <Nav.Screen
-        name=" "
+        options={{ headerShown: false }}
+        name="Login"
+        component={Login}
+      />
+      <Nav.Screen
+        name="Main"
         component={Main}
         options={{
           headerLeft: () => <HeaderLeftLogo>SE. SCO</HeaderLeftLogo>,
           headerRight: () => <HeaderRightBtns />,
+          headerTitleStyle: { color: "#d8dbe2" },
         }}
       />
       <Nav.Screen name="Stack" component={Stack} />
