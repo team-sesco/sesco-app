@@ -65,6 +65,11 @@ const Root = ({ jwtToken }) => {
         }}
       />
       <Nav.Screen name="Stack" component={Stack} options={{ headerShown: false }} />
+      <Nav.Screen
+        name="DetectPestResult"
+        component={DetectPestResult}
+        options={{ headerShown: false }}
+      />
     </Nav.Navigator>
   );
 };
