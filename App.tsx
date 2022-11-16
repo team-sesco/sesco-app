@@ -1,12 +1,16 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import Root from "./navigation/Root";
-import Login from "./screens/Login/Login";
+import React, { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import Root from './navigation/Root';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
+  const [jwtToken, setJwtToken] = useState('');
+  AsyncStorage.getItem('jwtToken', (_, result) => {
+    setJwtToken(result);
+  });
   return (
     <NavigationContainer>
-      <Root />
+      <Root jwtToken={jwtToken} />
     </NavigationContainer>
   );
 }
