@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/macos,windows,react,reactnative,android,androidstudio,xcode,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,windows,react,reactnative,android,androidstudio,xcode,node
 
+### environment ###
+environment
+env.ts
+
 ### Android ###
 # Gradle files
 .gradle/
