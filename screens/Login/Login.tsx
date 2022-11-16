@@ -1,9 +1,9 @@
-import React from "react";
-import LoginButton from "../../components/LoginButton";
-import tempIcon from "../../assets/tempIcon.png";
-import googleImg from "../../assets/google.png";
-import kakaoImg from "../../assets/kakao-talk.png";
-import naverImg from "../../assets/naver.png";
+import React, { useState } from 'react';
+import LoginButton from '../../components/LoginButton';
+import tempIcon from '../../assets/tempIcon.png';
+import googleImg from '../../assets/google.png';
+import kakaoImg from '../../assets/kakao-talk.png';
+import naverImg from '../../assets/naver.png';
 import {
   Container,
   LoginButtonContainer,
@@ -11,19 +11,48 @@ import {
   LoginTitle1,
   LoginTitle2,
   LoginTopContainer,
-} from "./LoginStyled";
-import { useNavigation } from "@react-navigation/native";
-import { StatusBar } from "react-native";
+} from './LoginStyled';
+import { useNavigation } from '@react-navigation/native';
+import { Alert, Platform, StatusBar } from 'react-native';
+import { KakaoOAuthToken, login } from '@react-native-seoul/kakao-login';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BASE_URI } from '../../api/api';
 
 const Login = () => {
   const navigation = useNavigation();
   const goToMain = () => {
     //@ts-ignore
-    navigation.navigate("Main");
+    navigation.navigate('Main');
   };
+
+  const laterService = () => {
+    Alert.alert('추후 지원 예정입니다.');
+  };
+
+  const signInWithKakao = async (): Promise<void> => {
+    try {
+      const { accessToken }: KakaoOAuthToken = await login();
+      const sendInfo = { access_token: accessToken };
+
+      const {
+        result: { access_token },
+      } = await fetch(`${BASE_URI}/api/auth/oauth/kakao`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sendInfo),
+      }).then((res) => res.json());
+      AsyncStorage.setItem('jwtToken', access_token, () => {
+        navigation.navigate('Main');
+      });
+    } catch (err) {
+      console.error('login err', err);
+      Alert.alert('로그인이 실패하였습니다.');
+    }
+  };
+
   return (
     <Container>
-      <StatusBar barStyle={"dark-content"} />
+      <StatusBar barStyle={'dark-content'} />
       <LoginTopContainer>
         <LoginLogo source={tempIcon} />
         <LoginTitle1>안녕하세요</LoginTitle1>
@@ -33,54 +62,60 @@ const Login = () => {
         <LoginButton
           onPress={goToMain}
           text="병해충 진단 미리보기"
-          bgColor={"#FFF"}
+          bgColor={'#FFF'}
           marginBottom={40}
-          textColor={"#48a346"}
+          textColor={'#48a346'}
           isBorder={true}
-          borderColor={"#48a346"}
+          borderColor={'#48a346'}
           isExpoIcon={false}
           fontSize={17}
           fontWeight={600}
         ></LoginButton>
         <LoginButton
+          onPress={laterService}
           name="Google"
-          bgColor={"#FFF"}
-          marginLeft={35}
+          bgColor={'#FFF'}
+          marginLeft={28}
           marginBottom={10}
           imgSource={googleImg}
-          textColor={"#000"}
+          textColor={'#000'}
           isBorder={true}
-          borderColor={"#000"}
+          borderColor={'#000'}
           size={15}
           fontSize={15}
         ></LoginButton>
+        {Platform.OS === 'ios' ? (
+          <LoginButton
+            onPress={laterService}
+            name="Apple"
+            bgColor={'#000'}
+            marginLeft={28}
+            marginBottom={10}
+            isExpoIcon={true}
+            textColor={'#FFF'}
+            isBorder={false}
+            fontSize={15}
+          ></LoginButton>
+        ) : null}
         <LoginButton
-          name="Apple"
-          bgColor={"#000"}
-          marginLeft={35}
-          marginBottom={10}
-          isExpoIcon={true}
-          textColor={"#FFF"}
-          isBorder={false}
-          fontSize={15}
-        ></LoginButton>
-        <LoginButton
+          onPress={() => signInWithKakao()}
           name="Kakao"
-          bgColor={"#FEE500"}
-          marginLeft={35}
+          bgColor={'#FEE500'}
+          marginLeft={28}
           marginBottom={10}
           imgSource={kakaoImg}
-          textColor={"#000"}
+          textColor={'#000'}
           isBorder={false}
           size={16}
           fontSize={15}
         ></LoginButton>
         <LoginButton
+          onPress={laterService}
           name="Naver"
-          bgColor={"#00B534"}
-          marginLeft={35}
+          bgColor={'#00B534'}
+          marginLeft={28}
           imgSource={naverImg}
-          textColor={"#FFF"}
+          textColor={'#FFF'}
           isBorder={false}
           size={13}
           fontSize={15}
