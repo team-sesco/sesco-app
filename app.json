@@ -3,7 +3,17 @@
     "name": "sesco-app",
     "slug": "sesco-app-react-native",
     "version": "1.0.0",
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends.",
+          "cameraPermission": "Allow SE. SCO to access your camera",
+          "microPhonePermission": "Allow SE. SCO to access your microphone"
+        }
+      ]
+    ]
   },
   "name": "sesco-app"
 }
