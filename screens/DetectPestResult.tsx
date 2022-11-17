@@ -111,7 +111,17 @@ const AskButtonText = styled.Text`
 
 const DetectPestResult = ({
   route: {
-    params: { photoUri, userLocation },
+    params: {
+      response: {
+        result: {
+          category,
+          created_at,
+          img: photoUri,
+          location: { address_name: userLocation },
+          result: pestResult,
+        },
+      },
+    },
   },
 }) => {
   const scrollViewRef = useRef();
@@ -123,10 +133,13 @@ const DetectPestResult = ({
   const navigation = useNavigation();
   const [isResult, setIsResult] = useState(true);
   const [isVisual, setIsVisual] = useState(false);
-
   const [chatsArr, setChatArr] = useState([
     { type: 'bot', text: '병해충 탐지가 완료되었습니다.' },
-    { type: 'bot', text: '이상민관계자님 작물에서는 고추 탄저병이 탐지 되었습니다.' },
+    {
+      type: 'bot',
+      text: `사용자1님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
+      point: pestResult,
+    },
     { type: 'bot', text: '아래 버튼을 눌러서 원하는 정보를 얻어보세요!' },
   ]);
 
@@ -197,9 +210,16 @@ const DetectPestResult = ({
         ref={scrollViewRef}
         onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}
       >
-        {chatsArr.map(({ type, text }, index) => {
+        {chatsArr.map(({ type, text, point = false }, index) => {
           if (type === 'bot') {
-            return <ChatLeftBox key={index} content={text} isFontSize={isFontSize} />;
+            return (
+              <ChatLeftBox
+                key={index}
+                content={text}
+                isFontSize={isFontSize}
+                point={point}
+              />
+            );
           }
           return <ChatRightBox key={index} content={text} isFontSize={isFontSize} />;
         })}
