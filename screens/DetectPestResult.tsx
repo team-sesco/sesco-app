@@ -158,6 +158,17 @@ const DetectPestResult = ({
     setIsBookMark(true);
   };
 
+  const repeatResult = () => {
+    const tempChatsArr = [...chatsArr];
+    tempChatsArr.push({ type: 'human', text: '결과 내용 다시 보여주세요!' });
+    tempChatsArr.push({
+      type: 'bot',
+      text: `사용자1님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
+      point: pestResult,
+    });
+    setChatArr([...tempChatsArr]);
+  };
+
   const initFontSize = () => {
     if (isFontSize) {
       setIsFontSize(false);
@@ -238,6 +249,9 @@ const DetectPestResult = ({
         </AskButton>
         <AskButton>
           <AskButtonText>대처 방안</AskButtonText>
+        </AskButton>
+        <AskButton onPress={repeatResult}>
+          <AskButtonText>결과 다시보기</AskButtonText>
         </AskButton>
         <AskButton onPress={initFontSize}>
           <AskButtonText>{isFontSize ? '글자 줄여줘' : '글자 키워줘'}</AskButtonText>
