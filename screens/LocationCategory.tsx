@@ -113,12 +113,7 @@ const LocationCategory = () => {
     )
       .then((res) => res.json())
       .then((json) => {
-        setDetailLocation({
-          location1: json.documents[0].region_1depth_name,
-          location2: json.documents[0].region_2depth_name,
-          location3: json.documents[0].region_3depth_name,
-          location4: json.documents[0].region_4depth_name,
-        });
+        setDetailLocation(json.documents[0]);
         setUserLocation(json.documents[0].address_name);
       })
       .then(() => setIsReady(true));

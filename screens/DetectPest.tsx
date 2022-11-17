@@ -241,14 +241,14 @@ const DetectPest = ({ route: { params } }) => {
 
   useEffect(() => {
     if (params) {
-      if (params.userLocation) {
-        setUserLocation(params.userLocation);
+      if (params.detailLocation) {
+        setUserLocation(params.detailLocation);
         setIsLocation(1);
         setUserLocation1And2(
-          `${params.detailLocation.location1} ${params.detailLocation.location2}`
+          `${params.detailLocation.region_1depth_name} ${params.detailLocation.region_2depth_name}`
         );
         setUserLocation3And4(
-          `${params.detailLocation.location3} ${params.detailLocation.location4}`
+          `${params.detailLocation.region_3depth_name} ${params.detailLocation.region_4depth_name}`
         );
       }
       if (params.userCrop) {
@@ -269,37 +269,34 @@ const DetectPest = ({ route: { params } }) => {
 
   const submitPestInfo = async () => {
     setIsReady(false);
-
-    const result = await fetch(`${BASE_URI}/api/v1/detection`, {
+    const response = await fetch(`${BASE_URI}/api/v1/detection`, {
       method: 'POST',
-      body: {
+      body: JSON.stringify({
         img: photoUri,
-        category: userCrop,
+        category: userCrop.cropName,
         location: userLocation,
-        coordinate: { latitude: 37.476004, longitude: 126.69826 },
-      },
+      }),
       headers: {
         Authorization: `Bearer ${jwtToken}`,
         'Content-Type': 'application/json',
       },
     }).then((res) => res.json());
-    console.log(result);
-
-    const response = await fetch(`${BASE_URI}/api/v1/detection/${result.result}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
-    }).then((res) => res.json());
     console.log(response);
+    if (response.msg === 'success') {
+      navigation.navigate('DetectPestResult', {
+        response,
+      });
+      setIsPhoto(0);
+      setIsLocation(0);
+      setIsCrop(0);
+      setIsReady(true);
+      setUserLocation(null);
+      setUserCrop(null);
+      setPhotoUri('');
+      return;
+    }
     setIsReady(true);
-    setIsPhoto(0);
-    setIsLocation(0);
-    setIsCrop(0);
-    navigation.navigate('DetectPestResult', { photoUri, userLocation });
-    setUserLocation(null);
-    setUserCrop(null);
-    setPhotoUri('');
+    Alert.alert('잠시 후 다시 시도해주세요!');
   };
 
   return (
