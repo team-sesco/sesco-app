@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import carrotGIF from '../assets/carrot.gif';
 import { Alert } from 'react-native';
+import { KAKAO_REST_API_KEY } from '../environment/env';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -89,10 +90,7 @@ const LocationCategory = () => {
 
     if (status !== 'granted') {
       console.log('사용자가 동의하지 않아 위치정보를 불러올 수 없습니다.');
-      Alert.alert(
-        '위치 접근 오류',
-        '설정에 들어가서 위치 접근을 허용해주세요!'
-      );
+      Alert.alert('위치 접근 오류', '설정에 들어가서 위치 접근을 허용해주세요!');
       setIsReady(true);
       return;
     }
@@ -109,7 +107,7 @@ const LocationCategory = () => {
       `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${longitude}&y=${latitude}`,
       {
         headers: {
-          Authorization: 'KakaoAK 14a689d39d0bdfe631e36de373e2e9bc',
+          Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
         },
       }
     )
