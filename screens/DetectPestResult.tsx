@@ -177,6 +177,15 @@ const DetectPestResult = ({
     setIsFontSize(true);
   };
 
+  const graphData = {
+    labels: ['고추탄저병', '고추흰가루병', '고추세균성점무늬병'],
+    datasets: [
+      {
+        data: [96.42, 11.54, 18.19],
+      },
+    ],
+  };
+
   return (
     <Background>
       {/* <BackToMainWrapper statusBarHeight={STATUSBAR_HEIGHT} onPress={goToMain}>
@@ -236,7 +245,23 @@ const DetectPestResult = ({
         })}
       </ScrollViewContainer>
       <ScrollViewContainer display={isVisual}>
-        <Text>시각자료</Text>
+        <BarChart
+          data={graphData}
+          width={PHONE_WIDTH}
+          height={220}
+          chartConfig={{
+            backgroundGradientFrom: '#FFF',
+            backgroundGradientTo: '#FFF',
+            color: (opacity = 1) => `rgba(32, 53, 32, ${opacity})`,
+            strokeWidth: 2, // optional, default 3
+            useShadowColorFromDataset: false, // optional
+          }}
+          fromZero={true}
+          // withInnerLines={false}
+          yAxisSuffix={'%'}
+          showBarTops={true}
+          showValuesOnTopOfBars={true}
+        />
       </ScrollViewContainer>
       <SeparationLine isIOS={Platform.OS === 'ios'} />
       <AskButtonBox
