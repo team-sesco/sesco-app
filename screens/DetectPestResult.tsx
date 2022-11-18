@@ -6,6 +6,7 @@ import { Alert, Dimensions, Platform, StatusBar, Text, View } from 'react-native
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import ChatLeftBox from '../components/ChatLeftBox';
 import ChatRightBox from '../components/ChatRightBox';
+import { BarChart } from 'react-native-chart-kit';
 
 const Background = styled.View`
   width: 100%;
@@ -78,7 +79,8 @@ const DetectPestResult = ({
           created_at,
           img: photoUri,
           location: { address_name: userLocation },
-          result: pestResult,
+          result: { name: pestResult, ratio, visualization },
+          user_name: userName,
         },
       },
     },
@@ -97,7 +99,7 @@ const DetectPestResult = ({
     { type: 'bot', text: '병해충 탐지가 완료되었습니다.' },
     {
       type: 'bot',
-      text: `사용자1님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
+      text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
       point: pestResult,
     },
     { type: 'bot', text: '아래 버튼을 눌러서 원하는 정보를 얻어보세요!' },
@@ -123,7 +125,7 @@ const DetectPestResult = ({
     tempChatsArr.push({ type: 'human', text: '결과 내용 다시 보여주세요!' });
     tempChatsArr.push({
       type: 'bot',
-      text: `사용자1님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
+      text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
       point: pestResult,
     });
     setChatArr([...tempChatsArr]);
@@ -136,24 +138,24 @@ const DetectPestResult = ({
     }
     setIsFontSize(true);
   };
-
+  const ratioNames = Object.keys(ratio);
+  const ratioValues = Object.values(ratio);
   const graphData = {
-    labels: ['고추탄저병', '고추흰가루병', '고추세균성점무늬병'],
+    labels: ratioNames,
     datasets: [
       {
-        data: [96.42, 11.54, 18.19],
+        data: ratioValues.map((value) => (value * 100).toFixed(2)),
       },
     ],
   };
 
   return (
     <Background>
-      {/* <BackToMainWrapper statusBarHeight={STATUSBAR_HEIGHT} onPress={goToMain}>
-        <Ionicons name="caret-back-outline" size={24} color={'#FFF'} />
-        <BackToMainText>메인화면으로 이동하기</BackToMainText>
-      </BackToMainWrapper> */}
-      <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
-
+      {isResult ? (
+        <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
+      ) : (
+        <PestPhoto source={{ uri: visualization }} phoneWidth={PHONE_WIDTH} />
+      )}
       <ContentContainer>
         <PestMode>
           <PestResult
