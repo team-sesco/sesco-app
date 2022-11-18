@@ -42,7 +42,7 @@ const Login = () => {
         body: JSON.stringify(sendInfo),
       }).then((res) => res.json());
       AsyncStorage.setItem('jwtToken', access_token, () => {
-        navigation.navigate('Main');
+        navigation.reset({ routes: [{ name: 'Main' }] });
       });
     } catch (err) {
       console.error('login err', err);
