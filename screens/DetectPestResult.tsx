@@ -10,23 +10,8 @@ import ChatRightBox from '../components/ChatRightBox';
 const Background = styled.View`
   width: 100%;
   height: 100%;
-  background-color: #edeef5;
+  background-color: #f7fbf9;
 `;
-
-const BackToMainWrapper = styled.TouchableOpacity<{ statusBarHeight: number }>`
-  flex-direction: row;
-  align-items: center;
-  margin: ${(props) => `${props.statusBarHeight + 10}px`} auto 10px;
-  background-color: #48a346;
-  width: 95%;
-`;
-const BackToMainText = styled.Text`
-  text-justify: center;
-  font-size: 18px;
-  font-weight: 600;
-  color: #fff;
-`;
-
 const PestPhoto = styled.Image<{ phoneWidth: number }>`
   width: ${(props) => props.phoneWidth}px;
   height: 300px;
@@ -38,31 +23,6 @@ const PestPhoto = styled.Image<{ phoneWidth: number }>`
 const ContentContainer = styled.View`
   margin: 0 auto;
   width: 95%;
-`;
-const PestTitle = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-`;
-const PestLeftWrapper = styled.View``;
-const PestRightWrapper = styled.View``;
-const PestName = styled.Text`
-  font-size: 25px;
-  font-weight: 600;
-  margin-bottom: 3px;
-  letter-spacing: 0.5px;
-`;
-const PestType = styled.Text`
-  font-size: 16px;
-`;
-const PestLocation = styled.Text`
-  text-align: right;
-  font-size: 15px;
-`;
-const PestTime = styled.Text`
-  text-align: right;
-  font-size: 13px;
 `;
 const PestMode = styled.View`
   margin-top: 15px;
@@ -76,7 +36,6 @@ const PestModeText = styled.Text<{ isActivate: boolean }>`
   font-size: 20px;
   font-weight: ${(props) => (props.isActivate ? '700' : '400')};
   color: ${(props) => (props.isActivate ? '#000' : 'rgba(0,0,0,0.5)')};
-  text-decoration: ${(props) => (props.isActivate ? 'underline' : 'none')};
   margin-bottom: 10px;
 `;
 const ScrollViewContainer = styled.ScrollView<{ display: boolean }>`
@@ -89,7 +48,7 @@ const SeparationLine = styled.View<{ isIOS: boolean }>`
   bottom: ${(props) => (props.isIOS ? '80px' : '58px')};
   width: 100%;
   height: 1px;
-  border: 2px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 const AskButtonBox = styled.ScrollView<{ isIOS: boolean }>`
@@ -98,14 +57,15 @@ const AskButtonBox = styled.ScrollView<{ isIOS: boolean }>`
 `;
 const AskButton = styled.TouchableOpacity`
   height: 40px;
-  background-color: #48a346;
-  padding: 5px 15px;
+  background-color: #3b9660;
+  padding: 5px 20px;
   margin: 5px;
   border-radius: 12px;
   justify-content: center;
 `;
 const AskButtonText = styled.Text`
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 700;
   color: #fff;
 `;
 
@@ -195,16 +155,6 @@ const DetectPestResult = ({
       <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
 
       <ContentContainer>
-        <PestTitle>
-          <PestLeftWrapper>
-            <PestName>고추탄저병</PestName>
-            <PestType>고추🌶</PestType>
-          </PestLeftWrapper>
-          <PestRightWrapper>
-            <PestLocation>{userLocation}</PestLocation>
-            <PestTime>2022년 11월 09일 18시 36분</PestTime>
-          </PestRightWrapper>
-        </PestTitle>
         <PestMode>
           <PestResult
             onPress={() => {

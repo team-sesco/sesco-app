@@ -15,9 +15,9 @@ const ChatNickName = styled.Text`
   margin-bottom: 5px;
 `;
 const ChatWindow = styled.View`
-  background-color: #48a34690;
+  background-color: #48a34670;
   padding: 12px 10px;
-  border: 1px solid rgba(9, 9, 9, 0.3);
+  border: 1px solid rgba(9, 9, 9, 0.1);
   border-top-left-radius: 15px;
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;

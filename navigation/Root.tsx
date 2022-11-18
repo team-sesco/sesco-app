@@ -41,11 +41,11 @@ const Root = ({ jwtToken }) => {
     <Nav.Navigator
       screenOptions={{
         contentStyle: {
-          backgroundColor: '#e9ecf4',
+          backgroundColor: '#F7FBF9',
         },
         headerBackTitleVisible: false,
         headerStyle: {
-          backgroundColor: '#d8dbe2',
+          backgroundColor: '#F7FBF9',
         },
         headerTitleStyle: {
           color: 'white',
@@ -61,7 +61,7 @@ const Root = ({ jwtToken }) => {
         options={{
           headerLeft: () => <HeaderLeftLogo>SE. SCO</HeaderLeftLogo>,
           headerRight: () => <HeaderRightBtns />,
-          headerTitleStyle: { color: '#d8dbe2' },
+          headerTitleStyle: { color: '#F7FBF9' },
         }}
       />
       <Nav.Screen name="Stack" component={Stack} options={{ headerShown: false }} />

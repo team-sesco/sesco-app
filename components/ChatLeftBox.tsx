@@ -24,13 +24,15 @@ const ChatNickName = styled.Text`
 const ChatWindow = styled.View`
   background-color: #fff;
   padding: 12px 10px;
-  border: 1px solid rgba(9, 9, 9, 0.3);
+  border: 1px solid rgba(9, 9, 9, 0.1);
   border-top-right-radius: 15px;
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;
 `;
-const ChatContent = styled.Text<{ isFontSize: Boolean }>`
-  font-size: ${(props) => (props.isFontSize ? '20px' : '15px')};
+const ChatContent = styled.Text<{ isFontSize: Boolean; isPoint: String }>`
+  font-size: ${(props) => (props.isFontSize ? '20px' : props.isPoint ? '16px' : '15px')};
+  color: ${(props) => (props.isPoint ? '#3B9660' : '#000')};
+  font-weight: ${(props) => (props.isPoint ? '600' : '400')};
 `;
 
 const ChatLeftBox = ({ content, isFontSize, point }) => {

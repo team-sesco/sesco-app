@@ -1,10 +1,11 @@
-import React from "react";
-import { Dimensions, Text, View } from "react-native";
-import styled from "styled-components/native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect } from 'react';
+import { Alert, BackHandler, Dimensions } from 'react-native';
+import styled from 'styled-components/native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const Container = styled.ScrollView`
   width: 95%;
@@ -21,6 +22,7 @@ const MainBannerBtn = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
   flex-direction: row;
+  border: 1px solid rgba(9, 9, 9, 0.1);
 `;
 const MainBannerText = styled.Text`
   font-size: 16px;
@@ -38,7 +40,7 @@ const DetectPestBtn = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
   border-radius: 15px;
-  background-color: #48a346;
+  background-color: #3b9660;
 `;
 
 const DetectPestInnerBorder = styled.View`
@@ -66,6 +68,7 @@ const NormalBtn = styled.TouchableOpacity`
   background-color: white;
   border-radius: 15px;
   justify-content: space-around;
+  border: 1px solid rgba(9, 9, 9, 0.1);
 `;
 const NormalBtnText = styled.Text`
   color: #48a346;

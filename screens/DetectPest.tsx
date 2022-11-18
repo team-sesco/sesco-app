@@ -30,7 +30,7 @@ const LoadingGIF = styled.Image`
 const Background = styled.View`
   width: 100%;
   height: 100%;
-  background-color: #edeef5;
+  background-color: #f7fbf9;
 `;
 
 const Container = styled.ScrollView`
@@ -50,12 +50,12 @@ const PhotoUploadBtn = styled.TouchableOpacity<{
 }>`
   margin: 20px auto;
   background-color: #fff;
-  border: 3px solid ${(props) => `${props.isPhoto ? '#48a346' : '#e0e2ed'}`};
+  border: 1px solid ${(props) => `${props.isPhoto ? '#48a346' : '#e0e2ed'}`};
   width: ${(props) => `${props.width * 0.9}px`};
   max-width: 800px;
   height: ${(props) => `${props.width * 0.9}px`};
   max-height: 800px;
-  border-radius: 15px;
+  border-radius: 18px;
   align-items: center;
   justify-content: center;
 `;
@@ -72,13 +72,13 @@ const BottomContainer = styled.View<{ isAllFilled: boolean }>`
   background-color: #fff;
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
-  border: 1px solid ${(props) => (props.isAllFilled ? '#48a34650' : '#eee')};
+  border: 1px solid ${(props) => (props.isAllFilled ? '#3B966050' : '#eee')};
 `;
 const BottomNextButton = styled.TouchableOpacity<{ isAllFilled: boolean }>`
   width: 90%;
   height: 50px;
   margin: 20px auto;
-  background-color: ${(props) => (props.isAllFilled ? '#48a346' : '#D8DBE2')};
+  background-color: ${(props) => (props.isAllFilled ? '#3B9660' : '#D8DBE270')};
   border-radius: 15px;
   align-items: center;
   justify-content: center;
@@ -108,7 +108,6 @@ const DetectPest = ({ route: { params } }) => {
    * 카메라 부분
    */
   const [photoUri, setPhotoUri] = useState('');
-  const [photoBase64, setPhotoBase64] = useState('');
   const [cameraStatus, cameraRequestPermission] = ImagePicker.useCameraPermissions();
   const [libraryStatus, libraryRequestPermission] =
     ImagePicker.useMediaLibraryPermissions();
@@ -310,9 +309,9 @@ const DetectPest = ({ route: { params } }) => {
           <Progress.Bar
             style={{ marginTop: 15 }}
             progress={(isPhoto + isLocation + isCrop) / 3}
-            color={'#48a346'}
-            borderColor={'#E0E2ED'}
-            unfilledColor={'#E0E2ED'}
+            color={'#3b9660'}
+            borderColor={'#E0E2ED70'}
+            unfilledColor={'#E0E2ED70'}
             width={null}
           />
           <PhotoUploadBtn width={PHONE_WIDTH} onPress={actionCamera} isPhoto={isPhoto}>
@@ -320,8 +319,8 @@ const DetectPest = ({ route: { params } }) => {
               <Image
                 source={{ uri: photoUri }}
                 style={{
-                  width: PHONE_WIDTH * 0.89,
-                  height: PHONE_WIDTH * 0.89,
+                  width: PHONE_WIDTH * 0.894,
+                  height: PHONE_WIDTH * 0.894,
                   maxWidth: 800,
                   maxHeight: 800,
                   borderRadius: 15,
@@ -334,7 +333,7 @@ const DetectPest = ({ route: { params } }) => {
           <NormalBtnWrapper>
             <NormalButton
               onPress={goToLocationCategory}
-              borderColor={userLocation ? '#48a346' : '#e0e2ed'}
+              borderColor={userLocation ? '#48a346' : 'rgba(9,9,9,0.1)'}
               textName={
                 userLocation ? `${userLocation1And2}\n${userLocation3And4}` : '위치 선택'
               }
@@ -350,7 +349,7 @@ const DetectPest = ({ route: { params } }) => {
             />
             <NormalButton
               onPress={goToCropCategory}
-              borderColor={userCrop ? '#48a346' : '#e0e2ed'}
+              borderColor={userCrop ? '#48a346' : 'rgba(9,9,9,0.1)'}
               textName={userCrop ? userCrop.cropName : '작물 선택'}
               textColor={userCrop ? ' #48a346' : '#555'}
               fontSize={userCrop ? 20 : 16}
