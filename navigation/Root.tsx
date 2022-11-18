@@ -70,6 +70,7 @@ const Root = ({ jwtToken }) => {
         component={DetectPestResult}
         options={{ headerShown: false }}
       />
+      <Nav.Screen name="SameLogin" component={Login} options={{ headerShown: false }} />
     </Nav.Navigator>
   );
 };
