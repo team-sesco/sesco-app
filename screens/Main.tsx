@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import HeadSeparator from '../components/HeadSeparator';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const Background = styled.View`
@@ -104,6 +105,7 @@ const Main = () => {
   return (
     <Background>
       <Container>
+        <HeadSeparator />
         <VSeparator />
         <MainBannerBtn>
           <MainBannerText>SE. SCO를 처음 이용하시나요?</MainBannerText>
