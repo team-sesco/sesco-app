@@ -6,6 +6,7 @@ import { Octicons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
 import Login from '../screens/Login/Login';
 import DetectPestResult from '../screens/DetectPestResult';
+import Drawer from './Drawer';
 
 const HeaderLeftLogo = styled.Text`
   font-size: 30px;
@@ -23,19 +24,6 @@ const HeaderRightBtn = styled.TouchableOpacity`
 const Nav = createNativeStackNavigator();
 
 const Root = ({ jwtToken }) => {
-  const HeaderRightBtns = () => (
-    <HeaderRightBtnsContainer>
-      <HeaderRightBtn>
-        <Octicons name="search" color="#98A1BD" size={25} />
-      </HeaderRightBtn>
-      <HeaderRightBtn>
-        <Octicons name="bell" color="#98A1BD" size={25} />
-      </HeaderRightBtn>
-      <HeaderRightBtn>
-        <Octicons name="three-bars" color="#98A1BD" size={25} />
-      </HeaderRightBtn>
-    </HeaderRightBtnsContainer>
-  );
   return (
     <Nav.Navigator
       screenOptions={{
@@ -54,15 +42,6 @@ const Root = ({ jwtToken }) => {
       {!jwtToken ? (
         <Nav.Screen name="Login" component={Login} options={{ headerShown: false }} />
       ) : null}
-      <Nav.Screen
-        name="Main"
-        component={Main}
-        options={{
-          headerLeft: () => <HeaderLeftLogo>SE. SCO</HeaderLeftLogo>,
-          headerRight: () => <HeaderRightBtns />,
-          headerTitleStyle: { color: '#F7FBF9' },
-        }}
-      />
       <Nav.Screen name="Drawer" component={Drawer} options={{ headerShown: false }} />
       <Nav.Screen name="Stack" component={Stack} options={{ headerShown: false }} />
       <Nav.Screen
