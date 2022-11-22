@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import LoginButton from '../../components/LoginButton';
 import tempIcon from '../../assets/tempIcon.png';
 import googleImg from '../../assets/google.png';

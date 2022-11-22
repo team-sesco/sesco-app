@@ -1,7 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DetectPest from '../screens/DetectPest';
-import Login from '../screens/Login/Login';
 import CropCategory from '../screens/CropCategory';
 import LocationCategory from '../screens/LocationCategory';
 

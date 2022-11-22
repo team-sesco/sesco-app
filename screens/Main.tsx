@@ -1,12 +1,9 @@
-import React, { useEffect } from 'react';
-import { Alert, BackHandler, Dimensions } from 'react-native';
+import React from 'react';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import HeadSeparator from '../components/HeadSeparator';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const Background = styled.View`
   width: 100%;
   height: 100%;

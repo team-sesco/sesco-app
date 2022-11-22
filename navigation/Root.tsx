@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Main from '../screens/Main';
 import Stack from './Stack';
 import { Octicons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
