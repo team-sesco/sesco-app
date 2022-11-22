@@ -88,11 +88,6 @@ const BookMarkItem = styled.TouchableOpacity`
 
 const Main = () => {
   const navigation = useNavigation();
-  const logout = () => {
-    AsyncStorage.removeItem('jwtToken');
-    //@ts-ignore
-    navigation.reset({ routes: [{ name: 'SameLogin' }] });
-  };
 
   const goToDetectPest = () => {
     //@ts-ignore
@@ -121,7 +116,7 @@ const Main = () => {
           <Ionicons name="home-outline" color="#48a346" size={24} />
           <NormalBtnText>내 농작물</NormalBtnText>
         </NormalBtn>
-        <NormalBtn onPress={logout}>
+        <NormalBtn>
           <Ionicons name="map-outline" color="#48a346" size={24} />
           <NormalBtnText>지도</NormalBtnText>
         </NormalBtn>

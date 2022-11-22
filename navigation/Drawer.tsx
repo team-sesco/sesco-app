@@ -7,14 +7,24 @@ import {
 } from '@react-navigation/drawer';
 import ChangeName from '../screens/ChangeName';
 import Main from '../screens/Main';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import PersonalInfoPolicy from '../screens/PersonalInfoPolicy';
+import { useNavigation } from '@react-navigation/native';
 
 const DrawerNavigator = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => {
+  const navigation = useNavigation();
+  const logout = () => {
+    AsyncStorage.removeItem('jwtToken');
+    //@ts-ignore
+    navigation.reset({ routes: [{ name: 'SameLogin' }] });
+  };
+
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
+      <DrawerItem label="로그아웃" onPress={logout} />
     </DrawerContentScrollView>
   );
 };
@@ -31,6 +41,7 @@ const Drawer = () => {
           width: '80%',
         },
       }}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <DrawerNavigator.Screen
         name="Main"
