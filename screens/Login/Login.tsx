@@ -32,7 +32,7 @@ const Login = () => {
   const signInWithKakao = async (): Promise<void> => {
     try {
       const { accessToken }: KakaoOAuthToken = await login();
-      const sendInfo = { access_token: accessToken };
+      const sendInfo = { access_token: accessToken, device_token: 'tempDeviceToken' };
 
       const {
         result: { access_token },
