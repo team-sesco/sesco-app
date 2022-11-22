@@ -22,7 +22,7 @@ const Login = () => {
   const navigation = useNavigation();
   const goToMain = () => {
     //@ts-ignore
-    navigation.navigate('Main');
+    navigation.reset({ routes: [{ name: 'Drawer' }] });
   };
 
   const laterService = () => {
@@ -42,7 +42,7 @@ const Login = () => {
         body: JSON.stringify(sendInfo),
       }).then((res) => res.json());
       AsyncStorage.setItem('jwtToken', access_token, () => {
-        navigation.reset({ routes: [{ name: 'Main' }] });
+        navigation.reset({ routes: [{ name: 'Drawer' }] });
       });
     } catch (err) {
       console.error('login err', err);

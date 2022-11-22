@@ -6,7 +6,6 @@ import { Octicons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
 import Login from '../screens/Login/Login';
 import DetectPestResult from '../screens/DetectPestResult';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HeaderLeftLogo = styled.Text`
   font-size: 30px;
@@ -64,6 +63,7 @@ const Root = ({ jwtToken }) => {
           headerTitleStyle: { color: '#F7FBF9' },
         }}
       />
+      <Nav.Screen name="Drawer" component={Drawer} options={{ headerShown: false }} />
       <Nav.Screen name="Stack" component={Stack} options={{ headerShown: false }} />
       <Nav.Screen
         name="DetectPestResult"
