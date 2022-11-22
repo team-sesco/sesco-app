@@ -1,8 +1,7 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components/native';
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Alert, Dimensions, Platform, StatusBar, Text, View } from 'react-native';
+import { Dimensions, Platform, StatusBar } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import ChatLeftBox from '../components/ChatLeftBox';
 import ChatRightBox from '../components/ChatRightBox';

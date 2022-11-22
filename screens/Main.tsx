@@ -96,10 +96,11 @@ const Main = () => {
 
   const goToDetectPest = () => {
     //@ts-ignore
-    navigation.navigate("Stack", {
-      screen: "DetectPest",
+    navigation.navigate('Stack', {
+      screen: 'DetectPest',
     });
   };
+
   return (
     <Container>
       <VSeparator />
