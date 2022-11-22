@@ -225,7 +225,7 @@ const DetectPest = ({ route: { params } }) => {
                   } else {
                     Alert.alert('업로드에 실패하였습니다.');
                   }
-                  setIsReady(true);
+                  setTimeout(() => setIsReady(true), 1500);
                 }
               } catch {
                 Alert.alert('오류가 발생하였습니다.');
@@ -280,18 +280,19 @@ const DetectPest = ({ route: { params } }) => {
         'Content-Type': 'application/json',
       },
     }).then((res) => res.json());
-    console.log(response);
+
     if (response.msg === 'success') {
-      navigation.navigate('DetectPestResult', {
-        response,
-      });
       setIsPhoto(0);
       setIsLocation(0);
       setIsCrop(0);
-      setIsReady(true);
       setUserLocation(null);
       setUserCrop(null);
       setPhotoUri('');
+
+      navigation.navigate('DetectPestResult', {
+        response,
+      });
+      setIsReady(true);
       return;
     }
     setIsReady(true);
