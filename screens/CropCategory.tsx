@@ -68,7 +68,7 @@ const CropCategory = () => {
     { id: 2, name: '배추', click: false },
     { id: 3, name: '콩', click: false },
     { id: 4, name: '파', click: false },
-    { id: 5, name: '알 수 없음', click: false },
+    { id: 5, name: '기타', click: false },
   ];
   const [cropDatas, setCropDatas] = useState(cropDatasArray);
   return (
