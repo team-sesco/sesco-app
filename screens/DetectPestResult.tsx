@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import { Dimensions, Platform, StatusBar } from 'react-native';
@@ -118,20 +118,45 @@ const DetectPestResult = ({
   const [isVisual, setIsVisual] = useState(false);
   const [visualUri, setVisualUri] = useState('');
   const [graphData, setGraphData] = useState({});
-  const [chatsArr, setChatArr] = useState([
-    { type: 'bot', text: '병해충 탐지가 완료되었습니다.' },
-    {
-      type: 'bot',
-      text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
-      point: pestResult,
-    },
-    { type: 'bot', text: '아래 버튼을 눌러서 원하는 정보를 얻어보세요!' },
-  ]);
+  const [chatsArr, setChatsArr] = useState([{}]);
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
       setJwtToken(result);
     });
+
+    const tempChatsArr = [...chatsArr];
+    tempChatsArr.pop();
+    if (pestResult.includes('정상')) {
+      tempChatsArr.push({
+        type: 'bot',
+        text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 탐지된 병해충이 없습니다.`,
+      });
+
+      if (unidentified) {
+        tempChatsArr.push({
+          type: 'bot',
+          text: '이 작물은 SE. SCO AI가 판단하기 어려운 병해충인 것 같아요! 전문가의 도움을 요청해보세요.',
+        });
+      }
+    } else {
+      tempChatsArr.push({
+        type: 'bot',
+        text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
+        point: pestResult,
+      });
+      if (unidentified) {
+        tempChatsArr.push({
+          type: 'bot',
+          text: '이 작물은 SE. SCO AI가 모르는 병해충인 것 같아요! 전문가의 도움을 요청해보세요.',
+        });
+      }
+    }
+    tempChatsArr.push({
+      type: 'bot',
+      text: '아래 버튼을 눌러서 원하는 정보를 얻어보세요!\n기타로 작물을 선택하셨다면 대처 방안이 제공되지 않습니다.',
+    });
+    setChatsArr([...tempChatsArr]);
   }, []);
 
   const getVisual = async () => {
@@ -177,13 +202,13 @@ const DetectPestResult = ({
     if (isBookMark) {
       tempChatsArr.push({ type: 'human', text: '북마크 해제해주세요!' });
       tempChatsArr.push({ type: 'bot', text: '북마크 해제하였습니다.' });
-      setChatArr([...tempChatsArr]);
+      setChatsArr([...tempChatsArr]);
       setIsBookMark(false);
       return;
     }
     tempChatsArr.push({ type: 'human', text: '북마크 등록해주세요!' });
     tempChatsArr.push({ type: 'bot', text: '북마크 등록하였습니다.' });
-    setChatArr([...tempChatsArr]);
+    setChatsArr([...tempChatsArr]);
     setIsBookMark(true);
   };
 
@@ -195,7 +220,7 @@ const DetectPestResult = ({
       text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
       point: pestResult,
     });
-    setChatArr([...tempChatsArr]);
+    setChatsArr([...tempChatsArr]);
   };
 
   const initFontSize = () => {
