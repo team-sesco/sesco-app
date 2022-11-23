@@ -183,12 +183,10 @@ const DetectPestResult = ({
       console.log(response);
       setVisualUri(response.result.visualization);
       setGraphData({
-        labels: Object.keys(response.result.ratio),
+        labels: response.result.ratio.name,
         datasets: [
           {
-            data: Object.values(response.result.ratio).map((value) =>
-              (value * 100).toFixed(2)
-            ),
+            data: response.result.ratio.value.map((value) => (value * 100).toFixed(2)),
           },
         ],
       });
