@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { Ionicons } from '@expo/vector-icons';
+import { Octicons, Ionicons, AntDesign, SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import HeadSeparator from '../components/HeadSeparator';
 
@@ -14,6 +14,36 @@ const Container = styled.ScrollView`
   width: 95%;
   margin: 0 auto;
 `;
+
+const Header = styled.View`
+  position: relative;
+  flex-direction: row;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const LeftHeader = styled.View`
+  position: absolute;
+  margin-left: 20px;
+`;
+const CenterHeader = styled.View`
+  margin: 0 auto;
+`;
+const TextHeader = styled.Text`
+  font-size: 30px;
+  font-weight: 600;
+  color: #3b9660;
+`;
+const RightHeader = styled.View`
+  position: absolute;
+  flex-direction: row;
+  margin-right: 10px;
+  right: 0px;
+`;
+const HeaderButton = styled.TouchableOpacity``;
+
 const VSeparator = styled.View`
   height: 15px;
 `;
@@ -103,6 +133,31 @@ const Main = () => {
     <Background>
       <Container>
         <HeadSeparator />
+        <VSeparator />
+        <Header>
+          <LeftHeader>
+            <HeaderButton onPress={() => navigation.openDrawer()}>
+              <Octicons name="three-bars" color="#98A1BD" size={28} />
+            </HeaderButton>
+          </LeftHeader>
+          <CenterHeader>
+            <TextHeader>SE. SCO</TextHeader>
+          </CenterHeader>
+          <RightHeader>
+            <HeaderButton>
+              <AntDesign
+                name="search1"
+                color="#98A1BD"
+                size={28}
+                style={{ marginRight: 15 }}
+              />
+            </HeaderButton>
+            <HeaderButton>
+              <SimpleLineIcons name="bell" color="#98A1BD" size={28} />
+            </HeaderButton>
+          </RightHeader>
+        </Header>
+        <VSeparator />
         <VSeparator />
         <MainBannerBtn>
           <MainBannerText>SE. SCO를 처음 이용하시나요?</MainBannerText>
