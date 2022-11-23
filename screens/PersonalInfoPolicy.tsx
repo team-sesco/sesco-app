@@ -46,7 +46,10 @@ const PersonalInfoPolicy = () => {
     <>
       <HeadSeparator />
       <Background>
-        <Container statusbarHeight={STATUSBAR_HEIGHT}>
+        <Container
+          statusbarHeight={STATUSBAR_HEIGHT}
+          showsVerticalScrollIndicator={false}
+        >
           <BackBotton onPress={goBack}>
             <Ionicons name="chevron-back-outline" size={24} color="black" />
           </BackBotton>

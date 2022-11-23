@@ -305,7 +305,7 @@ const DetectPest = ({ route: { params } }) => {
         <LoadingGIF source={carrotGIF} />
       </LoadingBackground>
       <Background>
-        <Container>
+        <Container showsVerticalScrollIndicator={false} r>
           <Title statusBarHeight={STATUSBAR_HEIGHT}>병해충 탐지</Title>
           <Progress.Bar
             style={{ marginTop: 15 }}
