@@ -268,7 +268,7 @@ const DetectPest = ({ route: { params } }) => {
 
   const submitPestInfo = async () => {
     setIsReady(false);
-    const response = await fetch(`${BASE_URI}/api/v1/detection`, {
+    const response = await fetch(`${BASE_URI}/api/v1/detection/predict`, {
       method: 'POST',
       body: JSON.stringify({
         img: photoUri,
@@ -291,6 +291,8 @@ const DetectPest = ({ route: { params } }) => {
 
       navigation.navigate('DetectPestResult', {
         response,
+        photoUri,
+        userCrop,
       });
       setIsReady(true);
       return;
