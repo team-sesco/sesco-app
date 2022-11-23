@@ -120,6 +120,7 @@ const DetectPestResult = ({
   const [graphData, setGraphData] = useState({});
   const [chatsArr, setChatsArr] = useState([{}]);
   const [preparation, setPreparation] = useState([]);
+  const [symptom, setSymptom] = useState('');
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
@@ -247,6 +248,38 @@ const DetectPestResult = ({
     setChatsArr([...tempChatsArr]);
   };
 
+  const getSymptom = async () => {
+    if (!symptom) {
+      const response = await fetch(
+        `${BASE_URI}/api/v1/detection/solution?disease=${pestResult.replace(
+          /\s/gi,
+          '_'
+        )}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      ).then((res) => res.json());
+
+      if (response.msg === 'success') {
+        setPreparation(response.result.대처방안);
+        setSymptom(response.result.증상);
+
+        const tempChatsArr = [...chatsArr];
+        tempChatsArr.push({ type: 'human', text: '증상에 대해서 알려주세요!' });
+        tempChatsArr.push({ type: 'bot', text: `${response.result.증상}` });
+        setChatsArr([...tempChatsArr]);
+        return;
+      }
+    }
+    const tempChatsArr = [...chatsArr];
+    tempChatsArr.push({ type: 'human', text: '증상에 대해서 알려주세요!' });
+    tempChatsArr.push({ type: 'bot', text: `${symptom}` });
+    setChatsArr([...tempChatsArr]);
+  };
+
   const repeatResult = () => {
     const tempChatsArr = [...chatsArr];
     tempChatsArr.push({ type: 'human', text: '결과 내용 다시 보여주세요!' });
@@ -355,6 +388,11 @@ const DetectPestResult = ({
         >
           <AskButton onPress={initBookMark}>
             <AskButtonText>{isBookMark ? '북마크 해제' : '북마크 등록'}</AskButtonText>
+          </AskButton>
+          <AskButton
+            onPress={getSymptom}
+          >
+            <AskButtonText>증상</AskButtonText>
           </AskButton>
           <AskButton
             onPress={getPreparation}
