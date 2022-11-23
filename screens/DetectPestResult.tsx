@@ -60,16 +60,18 @@ const ScrollViewContainer = styled.ScrollView<{ display: boolean }>`
   width: 95%;
   margin: 0 auto 90px;
 `;
-const SeparationLine = styled.View<{ isIOS: boolean }>`
+const SeparationLine = styled.View<{ isIOS: boolean; isActivate: boolean }>`
   position: absolute;
+  display: ${(props) => (props.isActivate ? 'flex' : 'none')};
   bottom: ${(props) => (props.isIOS ? '80px' : '58px')};
   width: 100%;
   height: 1px;
   border: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
-const AskButtonBox = styled.ScrollView<{ isIOS: boolean }>`
+const AskButtonBox = styled.ScrollView<{ isIOS: boolean; isActivate: boolean }>`
   position: absolute;
+  display: ${(props) => (props.isActivate ? 'flex' : 'none')};
   bottom: ${(props) => (props.isIOS ? '25px' : '3px')};
 `;
 const AskButton = styled.TouchableOpacity`
@@ -284,11 +286,12 @@ const DetectPestResult = ({
             />
           ) : null}
         </ScrollViewContainer>
-        <SeparationLine isIOS={Platform.OS === 'ios'} />
+        <SeparationLine isIOS={Platform.OS === 'ios'} isActivate={isResult} />
         <AskButtonBox
           horizontal={true}
           showHorizontalScrollIndicator={false}
           isIOS={Platform.OS === 'ios'}
+          isActivate={isResult}
         >
           <AskButton onPress={initBookMark}>
             <AskButtonText>{isBookMark ? '북마크 해제' : '북마크 등록'}</AskButtonText>
