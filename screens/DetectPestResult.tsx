@@ -6,7 +6,24 @@ import { getStatusBarHeight } from 'react-native-status-bar-height';
 import ChatLeftBox from '../components/ChatLeftBox';
 import ChatRightBox from '../components/ChatRightBox';
 import { BarChart } from 'react-native-chart-kit';
+import carrotGIF from '../assets/carrot.gif';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BASE_URI } from '../api/api';
 
+const LoadingBackground = styled.View<{ isLoading: boolean }>`
+  position: absolute;
+  z-index: 10;
+  display: ${(props) => (props.isLoading ? 'flex' : 'none')};
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+`;
+const LoadingGIF = styled.Image`
+  width: 120px;
+  height: 120px;
+`;
 const Background = styled.View`
   width: 100%;
   height: 100%;
@@ -87,6 +104,7 @@ const DetectPestResult = ({
   },
 }) => {
   const [jwtToken, setJwtToken] = useState('');
+  const [isReady, setIsReady] = useState(true);
   const scrollViewRef = useRef();
   const [isBookMark, setIsBookMark] = useState(false);
   const [isFontSize, setIsFontSize] = useState(false);
@@ -187,6 +205,10 @@ const DetectPestResult = ({
   };
 
   return (
+    <>
+      <LoadingBackground isLoading={!isReady}>
+        <LoadingGIF source={carrotGIF} />
+      </LoadingBackground>
       <Background>
         {isResult ? (
           <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
