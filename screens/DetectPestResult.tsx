@@ -125,9 +125,12 @@ const DetectPestResult = ({
     },
     { type: 'bot', text: '아래 버튼을 눌러서 원하는 정보를 얻어보세요!' },
   ]);
-  AsyncStorage.getItem('jwtToken', (_, result) => {
-    setJwtToken(result);
-  });
+
+  useEffect(() => {
+    AsyncStorage.getItem('jwtToken', (_, result) => {
+      setJwtToken(result);
+    });
+  }, []);
 
   const getVisual = async () => {
     if (hasVisual) return;
