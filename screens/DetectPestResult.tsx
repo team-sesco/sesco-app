@@ -119,6 +119,7 @@ const DetectPestResult = ({
   const [visualUri, setVisualUri] = useState('');
   const [graphData, setGraphData] = useState({});
   const [chatsArr, setChatsArr] = useState([{}]);
+  const [preparation, setPreparation] = useState([]);
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
@@ -208,6 +209,42 @@ const DetectPestResult = ({
     tempChatsArr.push({ type: 'bot', text: '북마크 등록하였습니다.' });
     setChatsArr([...tempChatsArr]);
     setIsBookMark(true);
+  };
+
+  const getPreparation = async () => {
+    if (preparation.length === 0) {
+      const response = await fetch(
+        `${BASE_URI}/api/v1/detection/solution?disease=${pestResult.replace(
+          /\s/gi,
+          '_'
+        )}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      ).then((res) => res.json());
+
+      if (response.msg === 'success') {
+        setPreparation(response.result.대처방안);
+        setSymptom(response.result.증상);
+
+        const tempChatsArr = [...chatsArr];
+        tempChatsArr.push({ type: 'human', text: '대처 방안 알려주세요!' });
+        response.result.대처방안.map((value) => {
+          tempChatsArr.push({ type: 'bot', text: `${value}` });
+        });
+        setChatsArr([...tempChatsArr]);
+        return;
+      }
+    }
+    const tempChatsArr = [...chatsArr];
+    tempChatsArr.push({ type: 'human', text: '대처 방안 알려주세요!' });
+    preparation.map((value) => {
+      tempChatsArr.push({ type: 'bot', text: `${value}` });
+    });
+    setChatsArr([...tempChatsArr]);
   };
 
   const repeatResult = () => {
@@ -319,7 +356,9 @@ const DetectPestResult = ({
           <AskButton onPress={initBookMark}>
             <AskButtonText>{isBookMark ? '북마크 해제' : '북마크 등록'}</AskButtonText>
           </AskButton>
-          <AskButton>
+          <AskButton
+            onPress={getPreparation}
+          >
             <AskButtonText>대처 방안</AskButtonText>
           </AskButton>
           <AskButton onPress={repeatResult}>
