@@ -74,7 +74,8 @@ const AskButtonBox = styled.ScrollView<{ isIOS: boolean; isActivate: boolean }>`
   display: ${(props) => (props.isActivate ? 'flex' : 'none')};
   bottom: ${(props) => (props.isIOS ? '25px' : '3px')};
 `;
-const AskButton = styled.TouchableOpacity`
+const AskButton = styled.TouchableOpacity<{ notSupport: boolean }>`
+  display: ${(props) => (props.notSupport ? 'none' : 'flex')};
   height: 40px;
   background-color: #3b9660;
   padding: 5px 20px;
@@ -156,7 +157,7 @@ const DetectPestResult = ({
     }
     tempChatsArr.push({
       type: 'bot',
-      text: '아래 버튼을 눌러서 원하는 정보를 얻어보세요!\n기타로 작물을 선택하셨다면 대처 방안이 제공되지 않습니다.',
+      text: '아래 버튼을 눌러서 원하는 정보를 얻어보세요!',
     });
     setChatsArr([...tempChatsArr]);
   }, []);
@@ -390,11 +391,13 @@ const DetectPestResult = ({
             <AskButtonText>{isBookMark ? '북마크 해제' : '북마크 등록'}</AskButtonText>
           </AskButton>
           <AskButton
+            notSupport={pestResult.includes('정상') || cropName === '기타'}
             onPress={getSymptom}
           >
             <AskButtonText>증상</AskButtonText>
           </AskButton>
           <AskButton
+            notSupport={pestResult.includes('정상') || cropName === '기타'}
             onPress={getPreparation}
           >
             <AskButtonText>대처 방안</AskButtonText>
