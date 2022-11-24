@@ -124,11 +124,6 @@ const LocationCategory = () => {
       coords: { longitude, latitude },
     } = await Location.getCurrentPositionAsync({ accuracy: 3 });
 
-    if (longitude < 123 || longitude > 133) {
-      Alert.alert('지원하지 않는 지역입니다!');
-      setIsReady(true);
-      return;
-    }
     await fetch(
       `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${longitude}&y=${latitude}`,
       {
@@ -139,6 +134,17 @@ const LocationCategory = () => {
     )
       .then((res) => res.json())
       .then((json) => {
+        if (!json.documents[0].region_1depth_name) {
+          mapRef.current.animateToRegion({
+            latitude: 37.5518018,
+            longitude: 127.0736345,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+          Alert.alert('지원하지 않는 지역입니다!');
+          setIsReady(true);
+          return;
+        }
         setDetailLocation(json.documents[0]);
         setUserLocation(json.documents[0].address_name);
       })
