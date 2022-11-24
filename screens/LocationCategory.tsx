@@ -156,68 +156,20 @@ const LocationCategory = () => {
         <Ionicons name="location-outline" size={24} color="#3B9660" />
         <Title>위치 선택</Title>
       </TitleWrapper>
-      <ChoiceButton
-        onPress={() => {
-          // 현재 위치 찾기 버튼이 눌러져있었다면
-          if (isCurrentLocationClick) {
-            setIsCurrentLocationClick(false);
-            setIsAnyClick(false);
-          } else {
-            // 아무 것도 안 눌러져 있었다면
-            setIsCurrentLocationClick(true);
-            setIsSearchLocationClick(false);
-            setIsAnyClick(true);
-            findMyCurrentLocation();
-          }
-        }}
-        style={
-          isCurrentLocationClick
-            ? { backgroundColor: '#3B9660' }
-            : { backgroundColor: '#eef1f8' }
-        }
-      >
-        <ChoiceTextWrapper>
-          {isCurrentLocationClick ? null : (
+      <ShowContainer style={{ backgroundColor: userLocation ? '#3B9660' : '#eef1f8' }}>
+        <ShowTextWrapper>
+          {!userLocation ? (
             <Ionicons
               name="location-outline"
               size={20}
               color={'rgba(0,0,0,0.5)'}
               style={{ marginRight: 5 }}
             />
-          )}
-          <ChoiceText isClick={isCurrentLocationClick}>
-            {isCurrentLocationClick ? userLocation : '현재 위치 찾기'}
-          </ChoiceText>
-        </ChoiceTextWrapper>
-      </ChoiceButton>
-
-      <ChoiceButton
-        onPress={() => {
-          // 검색해서 위치 찾기 버튼이 눌러져있었다면
-          if (isSearchLocationClick) {
-            setIsSearchLocationClick(false);
-            setIsAnyClick(false);
-          } else {
-            // 아무 것도 안 눌러져 있었다면
-            setIsSearchLocationClick(true);
-            setIsCurrentLocationClick(false);
-            setIsAnyClick(true);
-            findSearchLocation();
-          }
-        }}
-        style={
-          isSearchLocationClick
-            ? { backgroundColor: '#3B9660' }
-            : { backgroundColor: '#eef1f8' }
-        }
-      >
-        <ChoiceTextWrapper>
-          {isSearchLocationClick ? null : (
-            <Ionicons
-              name="search-outline"
-              size={20}
-              color={'#000'}
-              style={{ marginRight: 5 }}
+          ) : null}
+          <ShowText isUserLocation={!!userLocation}>
+            {!!userLocation ? userLocation : '내 위치'}
+          </ShowText>
+        </ShowTextWrapper>
       </ShowContainer>
       <MapViewBottomContainer>
         <MapViewContainer>
