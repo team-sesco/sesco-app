@@ -81,6 +81,8 @@ const BottomNextText = styled.Text<{ isAnyClick: boolean }>`
 const LocationCategory = () => {
   const navigation = useNavigation();
   const [isReady, setIsReady] = useState(true);
+  const [userLongitude, setUserLongitude] = useState(0);
+  const [userLatitude, setUserLatitude] = useState(0);
   const [userLocation, setUserLocation] = useState(null);
   const [detailLocation, setDetailLocation] = useState({});
   const [searchContent, setSearchContent] = useState('');
@@ -120,9 +122,20 @@ const LocationCategory = () => {
         setDetailLocation(json.documents[0]);
         setUserLocation(json.documents[0].address_name);
       })
-      .then(() => setIsReady(true));
+      .then(() => setIsReady(true))
+      .then(() => {
+        setUserLongitude(longitude);
+        setUserLatitude(latitude);
+      });
   };
-
+  const onSubmit = () => {
+    const realDetailLocation = { ...detailLocation };
+    realDetailLocation.x = userLongitude;
+    realDetailLocation.y = userLatitude;
+    navigation.navigate('DetectPest', {
+      realDetailLocation,
+    });
+  };
   const findSearchLocation = () => {};
 
   return (
@@ -207,11 +220,7 @@ const LocationCategory = () => {
         <BottomNextButton
           isAnyClick={isAnyClick}
           disabled={!isAnyClick}
-          onPress={() => {
-            navigation.navigate('DetectPest', {
-              detailLocation,
-            });
-          }}
+          onPress={onSubmit}
         >
           <BottomNextText isAnyClick={isAnyClick}>확인</BottomNextText>
         </BottomNextButton>

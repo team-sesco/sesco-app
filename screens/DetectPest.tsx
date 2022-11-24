@@ -240,14 +240,14 @@ const DetectPest = ({ route: { params } }) => {
 
   useEffect(() => {
     if (params) {
-      if (params.detailLocation) {
-        setUserLocation(params.detailLocation);
+      if (params.realDetailLocation) {
+        setUserLocation(params.realDetailLocation);
         setIsLocation(1);
         setUserLocation1And2(
-          `${params.detailLocation.region_1depth_name} ${params.detailLocation.region_2depth_name}`
+          `${params.realDetailLocation.region_1depth_name} ${params.realDetailLocation.region_2depth_name}`
         );
         setUserLocation3And4(
-          `${params.detailLocation.region_3depth_name} ${params.detailLocation.region_4depth_name}`
+          `${params.realDetailLocation.region_3depth_name} ${params.realDetailLocation.region_4depth_name}`
         );
       }
       if (params.userCrop) {
