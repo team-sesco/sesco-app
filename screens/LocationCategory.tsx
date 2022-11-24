@@ -232,6 +232,31 @@ const LocationCategory = () => {
             onRegionChange={(region) => {
               setUserRegion(region);
             }}
+            onRegionChangeComplete={async (region) => {
+              await fetch(
+                `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${region.longitude}&y=${region.latitude}`,
+                {
+                  headers: {
+                    Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
+                  },
+                }
+              )
+                .then((res) => res.json())
+                .then((json) => {
+                  if (!json.documents[0].region_1depth_name) {
+                    mapRef.current.animateToRegion({
+                      latitude: 37.5518018,
+                      longitude: 127.0736345,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    });
+                    Alert.alert('지원하지 않는 지역입니다!');
+                    return;
+                  }
+                  setDetailLocation(json.documents[0]);
+                  setUserLocation(json.documents[0].address_name);
+                });
+            }}
             initialRegion={{
               latitude: 37.5518018,
               longitude: 127.0736345,
