@@ -9,6 +9,7 @@ import { BarChart } from 'react-native-chart-kit';
 import carrotGIF from '../assets/carrot.gif';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
+import MapView, { Callout, Marker } from 'react-native-maps';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -89,6 +90,41 @@ const AskButtonText = styled.Text`
   color: #fff;
 `;
 
+const LocationContainer = styled.View`
+  /* left: 10px;
+  top: 10px; */
+`;
+const LocationBubble = styled.View`
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 6px;
+  border-color: #ccc;
+  border-width: 0.5px;
+  padding: 15px;
+`;
+const LocationText = styled.Text`
+  font-size: 16px;
+  margin-bottom: 5px;
+`;
+const LocationImage = styled.Image`
+  width: 120px;
+  height: 80px;
+`;
+const Arrow = styled.View`
+  background-color: transparent;
+  border-color: transparent;
+  border-top-color: #fff;
+  border-width: 16px;
+  margin-top: -32px;
+`;
+const ArrowBorder = styled.View`
+  background-color: transparent;
+  border-color: transparent;
+  border-top-color: #007a87;
+  border-width: 16px;
+  margin-top: -0.5px;
+`;
 const DetectPestResult = ({
   route: {
     params: {
@@ -367,23 +403,71 @@ const DetectPestResult = ({
           showsVerticalScrollIndicator={false}
         >
           {hasVisual ? (
-            <BarChart
-              data={graphData}
-              width={PHONE_WIDTH}
-              height={220}
-              chartConfig={{
-                backgroundGradientFrom: '#FFF',
-                backgroundGradientTo: '#FFF',
-                color: (opacity = 1) => `rgba(32, 53, 32, ${opacity})`,
-                strokeWidth: 2,
-                useShadowColorFromDataset: false, // optional
-              }}
-              fromZero={true}
-              // withInnerLines={false}
-              yAxisSuffix={'%'}
-              showBarTops={true}
-              showValuesOnTopOfBars={true}
-            />
+            <>
+              <BarChart
+                data={graphData}
+                width={PHONE_WIDTH}
+                height={220}
+                chartConfig={{
+                  backgroundGradientFrom: '#FFF',
+                  backgroundGradientTo: '#FFF',
+                  color: (opacity = 1) => `rgba(32, 53, 32, ${opacity})`,
+                  strokeWidth: 2,
+                  useShadowColorFromDataset: false,
+                }}
+                fromZero={true}
+                withInnerLines={false}
+                yAxisSuffix={'%'}
+                showBarTops={true}
+                showValuesOnTopOfBars={true}
+              />
+              <MapView
+                style={{ height: PHONE_WIDTH }}
+                userInterfaceStyle="light"
+                // followsUserLocation={true}
+                showsUserLocation={true}
+                rotateEnabled={false}
+                pitchEnabled={false}
+                initialRegion={{
+                  latitude: latitude,
+                  longitude: longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                }}
+              >
+                <Marker
+                  coordinate={{ latitude: 37.5873767, longitude: 127.097316501 }}
+                  image={require('../assets/location5.png')}
+                >
+                  <Callout tooltip>
+                    <LocationContainer>
+                      <LocationBubble>
+                        <LocationText>콩 점무늬병</LocationText>
+                        <LocationImage source={require('../assets/cong.jpg')} />
+                      </LocationBubble>
+                      <ArrowBorder></ArrowBorder>
+                      <Arrow></Arrow>
+                    </LocationContainer>
+                  </Callout>
+                </Marker>
+
+                <Marker
+                  coordinate={{ latitude: latitude, longitude: longitude }}
+                  image={require('../assets/location5.png')}
+                >
+                  <Callout tooltip>
+                    <LocationContainer>
+                      <LocationBubble>
+                        <LocationText>콩 점무늬병</LocationText>
+                        <LocationImage source={require('../assets/cong.jpg')} />
+                      </LocationBubble>
+                      <ArrowBorder></ArrowBorder>
+                      <Arrow></Arrow>
+                    </LocationContainer>
+                  </Callout>
+                </Marker>
+              </MapView>
+            </>
           ) : null}
         </ScrollViewContainer>
         <SeparationLine isIOS={Platform.OS === 'ios'} isActivate={isResult} />
