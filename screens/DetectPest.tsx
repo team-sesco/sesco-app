@@ -293,6 +293,7 @@ const DetectPest = ({ route: { params } }) => {
         response,
         photoUri,
         userCrop,
+        userLocation,
       });
       setIsReady(true);
       return;

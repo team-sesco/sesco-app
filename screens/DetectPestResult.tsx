@@ -103,6 +103,7 @@ const DetectPestResult = ({
       },
       photoUri,
       userCrop: { cropName },
+      userLocation: { x: longitude, y: latitude },
     },
   },
 }) => {
