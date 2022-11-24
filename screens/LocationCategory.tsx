@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import carrotGIF from '../assets/carrot.gif';
 import { Alert } from 'react-native';
 import { KAKAO_REST_API_KEY } from '../environment/env';
+import MapView, { Marker } from 'react-native-maps';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -52,30 +53,42 @@ const ChoiceText = styled.Text<{ isClick: boolean }>`
   font-weight: ${(props) => (props.isClick ? '600' : '400')};
   color: ${(props) => (props.isClick ? 'white' : 'black')};
 `;
-const BottomContainer = styled.View<{ isAnyClick: boolean }>`
+
+const MapViewBottomContainer = styled.View`
+  width: 100%;
+  flex: 1;
+`;
+
+const MapViewContainer = styled.View`
+  width: 90%;
+  flex: 1;
+  margin: 0 auto;
+`;
+
+  position: absolute;
+const BottomContainer = styled.View<{ isUserLocation: boolean }>`
   width: 100%;
   height: 120px;
-  position: absolute;
-  bottom: 0px;
+  bottom: -20px;
   background-color: #fff;
-  border: 1px solid ${(props) => (props.isAnyClick ? '#3B966050' : '#eee')};
+  border: 1px solid ${(props) => (props.isUserLocation ? '#3B966050' : '#eee')};
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
 `;
-const BottomNextButton = styled.TouchableOpacity<{ isAnyClick: boolean }>`
+const BottomNextButton = styled.TouchableOpacity<{ isUserLocation: boolean }>`
   width: 90%;
   height: 50px;
   margin: 20px auto;
-  background-color: ${(props) => (props.isAnyClick ? '#3B9660' : '#D8DBE290')};
+  background-color: ${(props) => (props.isUserLocation ? '#3B9660' : '#D8DBE290')};
   border-radius: 15px;
   align-items: center;
   justify-content: center;
 `;
 
-const BottomNextText = styled.Text<{ isAnyClick: boolean }>`
+const BottomNextText = styled.Text<{ isUserLocation: boolean }>`
   color: #fff;
   font-size: 17px;
-  font-weight: ${(props) => (props.isAnyClick ? '600' : '400')};
+  font-weight: ${(props) => (props.isUserLocation ? '600' : '400')};
 `;
 
 const LocationCategory = () => {
@@ -209,22 +222,28 @@ const LocationCategory = () => {
               size={20}
               color={'#000'}
               style={{ marginRight: 5 }}
+      <MapViewBottomContainer>
+        <MapViewContainer>
             />
-          )}
-          <ChoiceText isClick={isSearchLocationClick}>
-            {isSearchLocationClick ? userLocation : '검색해서 위치 찾기'}
-          </ChoiceText>
-        </ChoiceTextWrapper>
-      </ChoiceButton>
-      <BottomContainer isAnyClick={isAnyClick}>
-        <BottomNextButton
-          isAnyClick={isAnyClick}
-          disabled={!isAnyClick}
-          onPress={onSubmit}
-        >
-          <BottomNextText isAnyClick={isAnyClick}>확인</BottomNextText>
-        </BottomNextButton>
       </BottomContainer>
+          <MapView
+            style={{ flex: 1 }}
+            userInterfaceStyle="light"
+            showsUserLocation={true}
+            rotateEnabled={false}
+            pitchEnabled={false}
+          </MapView>
+        </MapViewContainer>
+        <BottomContainer isUserLocation={!!userLocation}>
+          <BottomNextButton
+            isUserLocation={!!userLocation}
+            disabled={!userLocation}
+            onPress={onSubmit}
+          >
+            <BottomNextText isUserLocation={!!userLocation}>확인</BottomNextText>
+          </BottomNextButton>
+        </BottomContainer>
+      </MapViewBottomContainer>
     </>
   );
 };
