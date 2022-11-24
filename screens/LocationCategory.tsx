@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -92,12 +92,14 @@ const BottomNextText = styled.Text<{ isUserLocation: boolean }>`
 `;
 
 const LocationCategory = () => {
+  const mapRef = useRef(null);
   const navigation = useNavigation();
   const [isReady, setIsReady] = useState(true);
   const [userLongitude, setUserLongitude] = useState(0);
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLocation, setUserLocation] = useState(null);
   const [detailLocation, setDetailLocation] = useState({});
+  const [userRegion, setUserRegion] = useState({});
 
   const findMyCurrentLocation = async () => {
     setIsReady(false);
@@ -216,16 +218,28 @@ const LocationCategory = () => {
               size={20}
               color={'#000'}
               style={{ marginRight: 5 }}
+      </ShowContainer>
       <MapViewBottomContainer>
         <MapViewContainer>
             />
-      </BottomContainer>
           <MapView
+            ref={mapRef}
             style={{ flex: 1 }}
             userInterfaceStyle="light"
             showsUserLocation={true}
             rotateEnabled={false}
             pitchEnabled={false}
+            onRegionChange={(region) => {
+              setUserRegion(region);
+            }}
+            initialRegion={{
+              latitude: 37.5518018,
+              longitude: 127.0736345,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
+          >
+            <Marker coordinate={userRegion} image={require('../assets/location5.png')} />
           </MapView>
         </MapViewContainer>
         <BottomContainer isUserLocation={!!userLocation}>
