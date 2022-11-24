@@ -123,6 +123,11 @@ const BookMarkItem = styled.TouchableOpacity`
 const Main = () => {
   const navigation = useNavigation();
 
+  const goToMap = () => {
+    //@ts-ignore
+    navigation.reset({ routes: [{ name: 'Map' }] });
+  };
+
   const goToDetectPest = () => {
     //@ts-ignore
     navigation.navigate('Stack', {
@@ -177,7 +182,7 @@ const Main = () => {
             <Ionicons name="home-outline" color="#48a346" size={24} />
             <NormalBtnText>내 농작물</NormalBtnText>
           </NormalBtn>
-          <NormalBtn>
+          <NormalBtn onPress={goToMap}>
             <Ionicons name="map-outline" color="#48a346" size={24} />
             <NormalBtnText>지도</NormalBtnText>
           </NormalBtn>
