@@ -35,7 +35,7 @@ const Title = styled.Text`
   margin-left: 5px;
 `;
 
-const ChoiceButton = styled.TouchableOpacity`
+const ShowContainer = styled.View`
   width: 90%;
   height: 50px;
   margin: 10px auto;
@@ -44,14 +44,14 @@ const ChoiceButton = styled.TouchableOpacity`
   border-radius: 15px;
   border: 1px solid rgba(9, 9, 9, 0.05);
 `;
-const ChoiceTextWrapper = styled.View`
+const ShowTextWrapper = styled.View`
   flex-direction: row;
   align-items: center;
 `;
-const ChoiceText = styled.Text<{ isClick: boolean }>`
+const ShowText = styled.Text<{ isUserLocation: boolean }>`
   font-size: 18px;
-  font-weight: ${(props) => (props.isClick ? '600' : '400')};
-  color: ${(props) => (props.isClick ? 'white' : 'black')};
+  font-weight: ${(props) => (props.isUserLocation ? '600' : '400')};
+  color: ${(props) => (props.isUserLocation ? 'white' : 'rgba(0,0,0,0.5)')};
 `;
 
 const MapViewBottomContainer = styled.View`
@@ -98,17 +98,12 @@ const LocationCategory = () => {
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLocation, setUserLocation] = useState(null);
   const [detailLocation, setDetailLocation] = useState({});
-  const [searchContent, setSearchContent] = useState('');
-  const [isAnyClick, setIsAnyClick] = useState(false);
-  const [isCurrentLocationClick, setIsCurrentLocationClick] = useState(false);
-  const [isSearchLocationClick, setIsSearchLocationClick] = useState(false);
 
   const findMyCurrentLocation = async () => {
     setIsReady(false);
-    let { status } = await Location.requestForegroundPermissionsAsync();
+    const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
-      console.log('사용자가 동의하지 않아 위치정보를 불러올 수 없습니다.');
       Alert.alert('위치 접근 오류', '설정에 들어가서 위치 접근을 허용해주세요!');
       setIsReady(true);
       return;
@@ -149,7 +144,6 @@ const LocationCategory = () => {
       realDetailLocation,
     });
   };
-  const findSearchLocation = () => {};
 
   return (
     <>
@@ -157,7 +151,7 @@ const LocationCategory = () => {
         <LoadingGIF source={carrotGIF} />
       </LoadingBackground>
       <TitleWrapper>
-        <Ionicons name="location-outline" size={24} color="#48a346" />
+        <Ionicons name="location-outline" size={24} color="#3B9660" />
         <Title>위치 선택</Title>
       </TitleWrapper>
       <ChoiceButton
@@ -185,7 +179,7 @@ const LocationCategory = () => {
             <Ionicons
               name="location-outline"
               size={20}
-              color={'#000'}
+              color={'rgba(0,0,0,0.5)'}
               style={{ marginRight: 5 }}
             />
           )}
