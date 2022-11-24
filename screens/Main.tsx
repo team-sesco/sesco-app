@@ -19,6 +19,7 @@ const Header = styled.View`
   position: relative;
   flex-direction: row;
   width: 100%;
+  height: 30px;
   margin: 0 auto;
   justify-content: space-between;
   align-items: center;
