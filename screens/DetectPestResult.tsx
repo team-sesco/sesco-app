@@ -55,10 +55,10 @@ const PestModeText = styled.Text<{ isActivate: boolean }>`
   color: ${(props) => (props.isActivate ? '#000' : 'rgba(0,0,0,0.5)')};
   margin-bottom: 10px;
 `;
-const ScrollViewContainer = styled.ScrollView<{ display: boolean }>`
+const ScrollViewContainer = styled.ScrollView<{ display: boolean; isResult: boolean }>`
   display: ${(props) => (props.display ? 'flex' : 'none')};
   width: 95%;
-  margin: 0 auto 90px;
+  margin: ${(props) => (props.isResult ? '0 auto 90px' : '0 auto 20px')};
 `;
 const SeparationLine = styled.View<{ isIOS: boolean; isActivate: boolean }>`
   position: absolute;
@@ -339,6 +339,7 @@ const DetectPestResult = ({
         </ContentContainer>
         <ScrollViewContainer
           display={isResult}
+          isResult={isResult}
           showsVerticalScrollIndicator={false}
           ref={scrollViewRef}
           onContentSizeChange={() =>
@@ -359,7 +360,11 @@ const DetectPestResult = ({
             return <ChatRightBox key={index} content={text} isFontSize={isFontSize} />;
           })}
         </ScrollViewContainer>
-        <ScrollViewContainer display={isVisual}>
+        <ScrollViewContainer
+          display={isVisual}
+          isResult={isResult}
+          showsVerticalScrollIndicator={false}
+        >
           {hasVisual ? (
             <BarChart
               data={graphData}
