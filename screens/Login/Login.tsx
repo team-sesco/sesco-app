@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import LoginButton from '../../components/LoginButton';
 import tempIcon from '../../assets/tempIcon.png';
 import googleImg from '../../assets/google.png';
@@ -22,7 +22,7 @@ const Login = () => {
   const navigation = useNavigation();
   const goToMain = () => {
     //@ts-ignore
-    navigation.navigate('Main');
+    navigation.reset({ routes: [{ name: 'Drawer' }] });
   };
 
   const laterService = () => {
@@ -32,7 +32,7 @@ const Login = () => {
   const signInWithKakao = async (): Promise<void> => {
     try {
       const { accessToken }: KakaoOAuthToken = await login();
-      const sendInfo = { access_token: accessToken };
+      const sendInfo = { access_token: accessToken, device_token: 'tempDeviceToken' };
 
       const {
         result: { access_token },
@@ -42,7 +42,7 @@ const Login = () => {
         body: JSON.stringify(sendInfo),
       }).then((res) => res.json());
       AsyncStorage.setItem('jwtToken', access_token, () => {
-        navigation.navigate('Main');
+        navigation.reset({ routes: [{ name: 'Drawer' }] });
       });
     } catch (err) {
       console.error('login err', err);

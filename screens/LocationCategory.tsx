@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import carrotGIF from '../assets/carrot.gif';
 import { Alert } from 'react-native';
+import { KAKAO_REST_API_KEY } from '../environment/env';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -40,13 +41,16 @@ const ChoiceButton = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
   border-radius: 15px;
+  border: 1px solid rgba(9, 9, 9, 0.05);
 `;
 const ChoiceTextWrapper = styled.View`
   flex-direction: row;
   align-items: center;
 `;
-const ChoiceText = styled.Text`
-  font-size: 17px;
+const ChoiceText = styled.Text<{ isClick: boolean }>`
+  font-size: 18px;
+  font-weight: ${(props) => (props.isClick ? '600' : '400')};
+  color: ${(props) => (props.isClick ? 'white' : 'black')};
 `;
 const BottomContainer = styled.View<{ isAnyClick: boolean }>`
   width: 100%;
@@ -54,7 +58,7 @@ const BottomContainer = styled.View<{ isAnyClick: boolean }>`
   position: absolute;
   bottom: 0px;
   background-color: #fff;
-  border: 1px solid ${(props) => (props.isAnyClick ? '#48a34650' : '#eee')};
+  border: 1px solid ${(props) => (props.isAnyClick ? '#3B966050' : '#eee')};
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
 `;
@@ -62,15 +66,16 @@ const BottomNextButton = styled.TouchableOpacity<{ isAnyClick: boolean }>`
   width: 90%;
   height: 50px;
   margin: 20px auto;
-  background-color: ${(props) => (props.isAnyClick ? '#48a346' : '#D8DBE2')};
+  background-color: ${(props) => (props.isAnyClick ? '#3B9660' : '#D8DBE290')};
   border-radius: 15px;
   align-items: center;
   justify-content: center;
 `;
 
-const BottomNextText = styled.Text`
+const BottomNextText = styled.Text<{ isAnyClick: boolean }>`
   color: #fff;
   font-size: 17px;
+  font-weight: ${(props) => (props.isAnyClick ? '600' : '400')};
 `;
 
 const LocationCategory = () => {
@@ -89,10 +94,7 @@ const LocationCategory = () => {
 
     if (status !== 'granted') {
       console.log('사용자가 동의하지 않아 위치정보를 불러올 수 없습니다.');
-      Alert.alert(
-        '위치 접근 오류',
-        '설정에 들어가서 위치 접근을 허용해주세요!'
-      );
+      Alert.alert('위치 접근 오류', '설정에 들어가서 위치 접근을 허용해주세요!');
       setIsReady(true);
       return;
     }
@@ -109,18 +111,13 @@ const LocationCategory = () => {
       `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${longitude}&y=${latitude}`,
       {
         headers: {
-          Authorization: 'KakaoAK 14a689d39d0bdfe631e36de373e2e9bc',
+          Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
         },
       }
     )
       .then((res) => res.json())
       .then((json) => {
-        setDetailLocation({
-          location1: json.documents[0].region_1depth_name,
-          location2: json.documents[0].region_2depth_name,
-          location3: json.documents[0].region_3depth_name,
-          location4: json.documents[0].region_4depth_name,
-        });
+        setDetailLocation(json.documents[0]);
         setUserLocation(json.documents[0].address_name);
       })
       .then(() => setIsReady(true));
@@ -153,7 +150,7 @@ const LocationCategory = () => {
         }}
         style={
           isCurrentLocationClick
-            ? { backgroundColor: '#48a346' }
+            ? { backgroundColor: '#3B9660' }
             : { backgroundColor: '#eef1f8' }
         }
       >
@@ -166,7 +163,7 @@ const LocationCategory = () => {
               style={{ marginRight: 5 }}
             />
           )}
-          <ChoiceText>
+          <ChoiceText isClick={isCurrentLocationClick}>
             {isCurrentLocationClick ? userLocation : '현재 위치 찾기'}
           </ChoiceText>
         </ChoiceTextWrapper>
@@ -188,7 +185,7 @@ const LocationCategory = () => {
         }}
         style={
           isSearchLocationClick
-            ? { backgroundColor: '#48a346' }
+            ? { backgroundColor: '#3B9660' }
             : { backgroundColor: '#eef1f8' }
         }
       >
@@ -201,7 +198,7 @@ const LocationCategory = () => {
               style={{ marginRight: 5 }}
             />
           )}
-          <ChoiceText>
+          <ChoiceText isClick={isSearchLocationClick}>
             {isSearchLocationClick ? userLocation : '검색해서 위치 찾기'}
           </ChoiceText>
         </ChoiceTextWrapper>
@@ -213,11 +210,10 @@ const LocationCategory = () => {
           onPress={() => {
             navigation.navigate('DetectPest', {
               detailLocation,
-              userLocation,
             });
           }}
         >
-          <BottomNextText>확인</BottomNextText>
+          <BottomNextText isAnyClick={isAnyClick}>확인</BottomNextText>
         </BottomNextButton>
       </BottomContainer>
     </>

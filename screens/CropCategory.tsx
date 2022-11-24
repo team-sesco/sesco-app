@@ -26,9 +26,12 @@ const ChoiceButton = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
   border-radius: 15px;
+  border: 1px solid rgba(9, 9, 9, 0.05);
 `;
-const ChoiceText = styled.Text`
-  font-size: 17px;
+const ChoiceText = styled.Text<{ isClick: boolean }>`
+  font-size: 18px;
+  color: ${(props) => (props.isClick ? 'white' : 'black')};
+  font-weight: ${(props) => (props.isClick ? '600' : '400')};
 `;
 const BottomContainer = styled.View<{ isAnyClick: boolean }>`
   width: 100%;
@@ -36,7 +39,7 @@ const BottomContainer = styled.View<{ isAnyClick: boolean }>`
   position: absolute;
   bottom: 0px;
   background-color: #fff;
-  border: 1px solid ${(props) => (props.isAnyClick ? '#48a34650' : '#eee')};
+  border: 1px solid ${(props) => (props.isAnyClick ? '#3B966050' : '#eee')};
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
 `;
@@ -44,15 +47,16 @@ const BottomNextButton = styled.TouchableOpacity<{ isAnyClick: boolean }>`
   width: 90%;
   height: 50px;
   margin: 20px auto;
-  background-color: ${(props) => (props.isAnyClick ? '#48a346' : '#D8DBE2')};
+  background-color: ${(props) => (props.isAnyClick ? '#3B9660' : '#D8DBE290')};
   border-radius: 15px;
   align-items: center;
   justify-content: center;
 `;
 
-const BottomNextText = styled.Text`
+const BottomNextText = styled.Text<{ isAnyClick: boolean }>`
   color: #fff;
   font-size: 17px;
+  font-weight: ${(props) => (props.isAnyClick ? '600' : '400')};
 `;
 const CropCategory = () => {
   const navigation = useNavigation();
@@ -64,7 +68,7 @@ const CropCategory = () => {
     { id: 2, name: '배추', click: false },
     { id: 3, name: '콩', click: false },
     { id: 4, name: '파', click: false },
-    { id: 5, name: '알 수 없음', click: false },
+    { id: 5, name: '기타', click: false },
   ];
   const [cropDatas, setCropDatas] = useState(cropDatasArray);
   return (
@@ -94,12 +98,10 @@ const CropCategory = () => {
               setCropDatas(copiedCrops);
             }}
             style={
-              crop.click
-                ? { backgroundColor: '#48a346' }
-                : { backgroundColor: '#eef1f8' }
+              crop.click ? { backgroundColor: '#3B9660' } : { backgroundColor: '#eef1f8' }
             }
           >
-            <ChoiceText>{crop.name}</ChoiceText>
+            <ChoiceText isClick={crop.click}>{crop.name}</ChoiceText>
           </ChoiceButton>
         ))}
       </ScrollViewContainer>
@@ -109,7 +111,7 @@ const CropCategory = () => {
           disabled={!isAnyClick}
           onPress={() => navigation.navigate('DetectPest', { userCrop })}
         >
-          <BottomNextText>확인</BottomNextText>
+          <BottomNextText isAnyClick={isAnyClick}>확인</BottomNextText>
         </BottomNextButton>
       </BottomContainer>
     </>

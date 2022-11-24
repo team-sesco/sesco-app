@@ -1,9 +1,9 @@
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
 export const Container = styled.View`
   position: relative;
   flex: 1;
-  background-color: #fff;
+  background-color: #f7fbf9;
 `;
 export const LoginTopContainer = styled.View`
   margin: 150px auto 0px;

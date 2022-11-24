@@ -30,7 +30,7 @@ const LoadingGIF = styled.Image`
 const Background = styled.View`
   width: 100%;
   height: 100%;
-  background-color: #edeef5;
+  background-color: #f7fbf9;
 `;
 
 const Container = styled.ScrollView`
@@ -50,12 +50,12 @@ const PhotoUploadBtn = styled.TouchableOpacity<{
 }>`
   margin: 20px auto;
   background-color: #fff;
-  border: 3px solid ${(props) => `${props.isPhoto ? '#48a346' : '#e0e2ed'}`};
+  border: 1px solid ${(props) => `${props.isPhoto ? '#48a346' : '#e0e2ed'}`};
   width: ${(props) => `${props.width * 0.9}px`};
   max-width: 800px;
   height: ${(props) => `${props.width * 0.9}px`};
   max-height: 800px;
-  border-radius: 15px;
+  border-radius: 18px;
   align-items: center;
   justify-content: center;
 `;
@@ -72,13 +72,13 @@ const BottomContainer = styled.View<{ isAllFilled: boolean }>`
   background-color: #fff;
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
-  border: 1px solid ${(props) => (props.isAllFilled ? '#48a34650' : '#eee')};
+  border: 1px solid ${(props) => (props.isAllFilled ? '#3B966050' : '#eee')};
 `;
 const BottomNextButton = styled.TouchableOpacity<{ isAllFilled: boolean }>`
   width: 90%;
   height: 50px;
   margin: 20px auto;
-  background-color: ${(props) => (props.isAllFilled ? '#48a346' : '#D8DBE2')};
+  background-color: ${(props) => (props.isAllFilled ? '#3B9660' : '#D8DBE270')};
   border-radius: 15px;
   align-items: center;
   justify-content: center;
@@ -108,7 +108,6 @@ const DetectPest = ({ route: { params } }) => {
    * 카메라 부분
    */
   const [photoUri, setPhotoUri] = useState('');
-  const [photoBase64, setPhotoBase64] = useState('');
   const [cameraStatus, cameraRequestPermission] = ImagePicker.useCameraPermissions();
   const [libraryStatus, libraryRequestPermission] =
     ImagePicker.useMediaLibraryPermissions();
@@ -226,7 +225,7 @@ const DetectPest = ({ route: { params } }) => {
                   } else {
                     Alert.alert('업로드에 실패하였습니다.');
                   }
-                  setIsReady(true);
+                  setTimeout(() => setIsReady(true), 1500);
                 }
               } catch {
                 Alert.alert('오류가 발생하였습니다.');
@@ -241,14 +240,14 @@ const DetectPest = ({ route: { params } }) => {
 
   useEffect(() => {
     if (params) {
-      if (params.userLocation) {
-        setUserLocation(params.userLocation);
+      if (params.detailLocation) {
+        setUserLocation(params.detailLocation);
         setIsLocation(1);
         setUserLocation1And2(
-          `${params.detailLocation.location1} ${params.detailLocation.location2}`
+          `${params.detailLocation.region_1depth_name} ${params.detailLocation.region_2depth_name}`
         );
         setUserLocation3And4(
-          `${params.detailLocation.location3} ${params.detailLocation.location4}`
+          `${params.detailLocation.region_3depth_name} ${params.detailLocation.region_4depth_name}`
         );
       }
       if (params.userCrop) {
@@ -269,37 +268,38 @@ const DetectPest = ({ route: { params } }) => {
 
   const submitPestInfo = async () => {
     setIsReady(false);
-
-    const result = await fetch(`${BASE_URI}/api/v1/detection`, {
+    const response = await fetch(`${BASE_URI}/api/v1/detection/predict`, {
       method: 'POST',
-      body: {
+      body: JSON.stringify({
         img: photoUri,
-        category: userCrop,
+        category: userCrop.cropName,
         location: userLocation,
-        coordinate: { latitude: 37.476004, longitude: 126.69826 },
-      },
+      }),
       headers: {
         Authorization: `Bearer ${jwtToken}`,
         'Content-Type': 'application/json',
       },
     }).then((res) => res.json());
-    console.log(result);
 
-    const response = await fetch(`${BASE_URI}/api/v1/detection/${result.result}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
-    }).then((res) => res.json());
-    console.log(response);
+    if (response.msg === 'success') {
+      setIsPhoto(0);
+      setIsLocation(0);
+      setIsCrop(0);
+      setUserLocation(null);
+      setUserCrop(null);
+      setPhotoUri('');
+
+      navigation.navigate('DetectPestResult', {
+        response,
+        photoUri,
+        userCrop,
+        userLocation,
+      });
+      setIsReady(true);
+      return;
+    }
     setIsReady(true);
-    setIsPhoto(0);
-    setIsLocation(0);
-    setIsCrop(0);
-    navigation.navigate('DetectPestResult', { photoUri, userLocation });
-    setUserLocation(null);
-    setUserCrop(null);
-    setPhotoUri('');
+    Alert.alert('잠시 후 다시 시도해주세요!');
   };
 
   return (
@@ -308,14 +308,14 @@ const DetectPest = ({ route: { params } }) => {
         <LoadingGIF source={carrotGIF} />
       </LoadingBackground>
       <Background>
-        <Container>
+        <Container showsVerticalScrollIndicator={false} r>
           <Title statusBarHeight={STATUSBAR_HEIGHT}>병해충 탐지</Title>
           <Progress.Bar
             style={{ marginTop: 15 }}
             progress={(isPhoto + isLocation + isCrop) / 3}
-            color={'#48a346'}
-            borderColor={'#E0E2ED'}
-            unfilledColor={'#E0E2ED'}
+            color={'#3b9660'}
+            borderColor={'#E0E2ED70'}
+            unfilledColor={'#E0E2ED70'}
             width={null}
           />
           <PhotoUploadBtn width={PHONE_WIDTH} onPress={actionCamera} isPhoto={isPhoto}>
@@ -323,8 +323,8 @@ const DetectPest = ({ route: { params } }) => {
               <Image
                 source={{ uri: photoUri }}
                 style={{
-                  width: PHONE_WIDTH * 0.89,
-                  height: PHONE_WIDTH * 0.89,
+                  width: PHONE_WIDTH * 0.894,
+                  height: PHONE_WIDTH * 0.894,
                   maxWidth: 800,
                   maxHeight: 800,
                   borderRadius: 15,
@@ -337,7 +337,7 @@ const DetectPest = ({ route: { params } }) => {
           <NormalBtnWrapper>
             <NormalButton
               onPress={goToLocationCategory}
-              borderColor={userLocation ? '#48a346' : '#e0e2ed'}
+              borderColor={userLocation ? '#48a346' : 'rgba(9,9,9,0.1)'}
               textName={
                 userLocation ? `${userLocation1And2}\n${userLocation3And4}` : '위치 선택'
               }
@@ -353,7 +353,7 @@ const DetectPest = ({ route: { params } }) => {
             />
             <NormalButton
               onPress={goToCropCategory}
-              borderColor={userCrop ? '#48a346' : '#e0e2ed'}
+              borderColor={userCrop ? '#48a346' : 'rgba(9,9,9,0.1)'}
               textName={userCrop ? userCrop.cropName : '작물 선택'}
               textColor={userCrop ? ' #48a346' : '#555'}
               fontSize={userCrop ? 20 : 16}

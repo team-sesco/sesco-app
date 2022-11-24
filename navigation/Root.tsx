@@ -1,75 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Main from '../screens/Main';
 import Stack from './Stack';
-import { Octicons } from '@expo/vector-icons';
-import styled from 'styled-components/native';
 import Login from '../screens/Login/Login';
 import DetectPestResult from '../screens/DetectPestResult';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Drawer from './Drawer';
+import Map from '../screens/Map';
 
-const HeaderLeftLogo = styled.Text`
-  font-size: 30px;
-  font-weight: 600;
-  color: #48a346;
-`;
-const HeaderRightBtnsContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-`;
-const HeaderRightBtn = styled.TouchableOpacity`
-  margin-left: 18px;
-`;
 const Nav = createNativeStackNavigator();
 
 const Root = ({ jwtToken }) => {
-  const HeaderRightBtns = () => (
-    <HeaderRightBtnsContainer>
-      <HeaderRightBtn>
-        <Octicons name="search" color="#98A1BD" size={25} />
-      </HeaderRightBtn>
-      <HeaderRightBtn>
-        <Octicons name="bell" color="#98A1BD" size={25} />
-      </HeaderRightBtn>
-      <HeaderRightBtn>
-        <Octicons name="three-bars" color="#98A1BD" size={25} />
-      </HeaderRightBtn>
-    </HeaderRightBtnsContainer>
-  );
   return (
     <Nav.Navigator
       screenOptions={{
         contentStyle: {
-          backgroundColor: '#e9ecf4',
+          backgroundColor: '#F7FBF9',
         },
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#d8dbe2',
-        },
-        headerTitleStyle: {
-          color: 'white',
-        },
+        headerShown: false,
       }}
     >
-      {!jwtToken ? (
-        <Nav.Screen name="Login" component={Login} options={{ headerShown: false }} />
-      ) : null}
-      <Nav.Screen
-        name="Main"
-        component={Main}
-        options={{
-          headerLeft: () => <HeaderLeftLogo>SE. SCO</HeaderLeftLogo>,
-          headerRight: () => <HeaderRightBtns />,
-          headerTitleStyle: { color: '#d8dbe2' },
-        }}
-      />
-      <Nav.Screen name="Stack" component={Stack} options={{ headerShown: false }} />
-      <Nav.Screen
-        name="DetectPestResult"
-        component={DetectPestResult}
-        options={{ headerShown: false }}
-      />
+      {!jwtToken ? <Nav.Screen name="Login" component={Login} /> : null}
+      <Nav.Screen name="Drawer" component={Drawer} />
+      <Nav.Screen name="Map" component={Map} />
+      <Nav.Screen name="Stack" component={Stack} />
+      <Nav.Screen name="DetectPestResult" component={DetectPestResult} />
+      <Nav.Screen name="SameLogin" component={Login} />
     </Nav.Navigator>
   );
 };

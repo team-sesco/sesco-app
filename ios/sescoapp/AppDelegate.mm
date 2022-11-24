@@ -18,6 +18,7 @@
 #import <ReactCommon/RCTTurboModuleManager.h>
 
 #import <react/config/ReactNativeConfig.h>
+#import <GoogleMaps/GoogleMaps.h>
 
 static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 
