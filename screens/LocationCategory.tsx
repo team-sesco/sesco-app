@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import carrotGIF from '../assets/carrot.gif';
@@ -65,7 +65,17 @@ const MapViewContainer = styled.View`
   margin: 0 auto;
 `;
 
+const CurrentLocationButton = styled.TouchableOpacity`
   position: absolute;
+  z-index: 1;
+  right: 10px;
+  bottom: 10px;
+  border: 1px solid #fff;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+`;
+
 const BottomContainer = styled.View<{ isUserLocation: boolean }>`
   width: 100%;
   height: 120px;
@@ -132,10 +142,21 @@ const LocationCategory = () => {
         setDetailLocation(json.documents[0]);
         setUserLocation(json.documents[0].address_name);
       })
-      .then(() => setIsReady(true))
       .then(() => {
         setUserLongitude(longitude);
         setUserLatitude(latitude);
+        mapRef.current.animateToRegion(
+          {
+            latitude: latitude,
+            longitude: longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          500
+        );
+      })
+      .then(() => {
+        setIsReady(true);
       });
   };
   const onSubmit = () => {
@@ -173,7 +194,14 @@ const LocationCategory = () => {
       </ShowContainer>
       <MapViewBottomContainer>
         <MapViewContainer>
+          <CurrentLocationButton onPress={findMyCurrentLocation}>
+            <MaterialCommunityIcons
+              name="target"
+              size={30}
+              color="#3B9660"
+              style={{ padding: 3 }}
             />
+          </CurrentLocationButton>
           <MapView
             ref={mapRef}
             style={{ flex: 1 }}
