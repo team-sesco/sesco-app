@@ -157,7 +157,7 @@ const DetectPestResult = ({
   const [visualUri, setVisualUri] = useState('');
   const [graphData, setGraphData] = useState({});
   const [chatsArr, setChatsArr] = useState([{}]);
-  const [preparation, setPreparation] = useState([]);
+  const [preparation, setPreparation] = useState('');
   const [symptom, setSymptom] = useState('');
 
   useEffect(() => {
@@ -251,7 +251,7 @@ const DetectPestResult = ({
   };
 
   const getPreparation = async () => {
-    if (preparation.length === 0) {
+    if (!preparation) {
       const response = await fetch(
         `${BASE_URI}/api/v1/detection/solution?disease=${pestResult.replace(
           /\s/gi,
@@ -271,18 +271,14 @@ const DetectPestResult = ({
 
         const tempChatsArr = [...chatsArr];
         tempChatsArr.push({ type: 'human', text: '대처 방안 알려주세요!' });
-        response.result.대처방안.map((value) => {
-          tempChatsArr.push({ type: 'bot', text: `${value}` });
-        });
+        tempChatsArr.push({ type: 'bot', text: `${response.result.대처방안}` });
         setChatsArr([...tempChatsArr]);
         return;
       }
     }
     const tempChatsArr = [...chatsArr];
     tempChatsArr.push({ type: 'human', text: '대처 방안 알려주세요!' });
-    preparation.map((value) => {
-      tempChatsArr.push({ type: 'bot', text: `${value}` });
-    });
+    tempChatsArr.push({ type: 'bot', text: `${preparation}` });
     setChatsArr([...tempChatsArr]);
   };
 
@@ -335,9 +331,6 @@ const DetectPestResult = ({
       return;
     }
     setIsFontSize(true);
-  };
-      },
-    ],
   };
 
   return (
