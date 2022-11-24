@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import carrotGIF from '../assets/carrot.gif';
 import { Alert } from 'react-native';
 import { KAKAO_REST_API_KEY } from '../environment/env';
+import MapView, { Marker } from 'react-native-maps';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -34,7 +35,7 @@ const Title = styled.Text`
   margin-left: 5px;
 `;
 
-const ChoiceButton = styled.TouchableOpacity`
+const ShowContainer = styled.View`
   width: 90%;
   height: 50px;
   margin: 10px auto;
@@ -43,57 +44,129 @@ const ChoiceButton = styled.TouchableOpacity`
   border-radius: 15px;
   border: 1px solid rgba(9, 9, 9, 0.05);
 `;
-const ChoiceTextWrapper = styled.View`
+const ShowTextWrapper = styled.View`
   flex-direction: row;
   align-items: center;
 `;
-const ChoiceText = styled.Text<{ isClick: boolean }>`
+const ShowText = styled.Text<{ isUserLocation: boolean }>`
   font-size: 18px;
-  font-weight: ${(props) => (props.isClick ? '600' : '400')};
-  color: ${(props) => (props.isClick ? 'white' : 'black')};
+  font-weight: ${(props) => (props.isUserLocation ? '600' : '400')};
+  color: ${(props) => (props.isUserLocation ? 'white' : 'rgba(0,0,0,0.5)')};
 `;
-const BottomContainer = styled.View<{ isAnyClick: boolean }>`
+
+const MapViewBottomContainer = styled.View`
+  width: 100%;
+  flex: 1;
+`;
+
+const MapViewContainer = styled.View`
+  width: 90%;
+  flex: 1;
+  margin: 0 auto;
+`;
+
+const CurrentLocationButton = styled.TouchableOpacity`
+  position: absolute;
+  z-index: 1;
+  right: 10px;
+  bottom: 10px;
+  border: 1px solid #fff;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+`;
+
+const BottomContainer = styled.View<{ isUserLocation: boolean }>`
   width: 100%;
   height: 120px;
-  position: absolute;
-  bottom: 0px;
+  bottom: -20px;
   background-color: #fff;
-  border: 1px solid ${(props) => (props.isAnyClick ? '#3B966050' : '#eee')};
+  border: 1px solid ${(props) => (props.isUserLocation ? '#3B966050' : '#eee')};
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
 `;
-const BottomNextButton = styled.TouchableOpacity<{ isAnyClick: boolean }>`
+const BottomNextButton = styled.TouchableOpacity<{ isUserLocation: boolean }>`
   width: 90%;
   height: 50px;
   margin: 20px auto;
-  background-color: ${(props) => (props.isAnyClick ? '#3B9660' : '#D8DBE290')};
+  background-color: ${(props) => (props.isUserLocation ? '#3B9660' : '#D8DBE290')};
   border-radius: 15px;
   align-items: center;
   justify-content: center;
 `;
 
-const BottomNextText = styled.Text<{ isAnyClick: boolean }>`
+const BottomNextText = styled.Text<{ isUserLocation: boolean }>`
   color: #fff;
   font-size: 17px;
-  font-weight: ${(props) => (props.isAnyClick ? '600' : '400')};
+  font-weight: ${(props) => (props.isUserLocation ? '600' : '400')};
 `;
 
 const LocationCategory = () => {
+  const mapRef = useRef(null);
   const navigation = useNavigation();
   const [isReady, setIsReady] = useState(true);
+  const [userLongitude, setUserLongitude] = useState(0);
+  const [userLatitude, setUserLatitude] = useState(0);
   const [userLocation, setUserLocation] = useState(null);
   const [detailLocation, setDetailLocation] = useState({});
-  const [searchContent, setSearchContent] = useState('');
-  const [isAnyClick, setIsAnyClick] = useState(false);
-  const [isCurrentLocationClick, setIsCurrentLocationClick] = useState(false);
-  const [isSearchLocationClick, setIsSearchLocationClick] = useState(false);
+  const [userRegion, setUserRegion] = useState({});
+
+  const getUserLocationIfGranted = async () => {
+    setIsReady(false);
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === 'granted') {
+      const {
+        coords: { longitude, latitude },
+      } = await Location.getCurrentPositionAsync({ accuracy: 3 });
+
+      await fetch(
+        `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${longitude}&y=${latitude}`,
+        {
+          headers: {
+            Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
+          },
+        }
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          if (!json.documents[0].region_1depth_name) {
+            mapRef.current.animateToRegion({
+              latitude: 37.5518018,
+              longitude: 127.0736345,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            });
+            Alert.alert('지원하지 않는 지역입니다!');
+            setIsReady(true);
+            return;
+          }
+          setDetailLocation(json.documents[0]);
+          setUserLocation(json.documents[0].address_name);
+        })
+        .then(() => {
+          setUserLongitude(longitude);
+          setUserLatitude(latitude);
+        });
+
+      mapRef.current.animateToRegion({
+        latitude: latitude,
+        longitude: longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    }
+    setIsReady(true);
+  };
+
+  useEffect(() => {
+    getUserLocationIfGranted();
+  }, []);
 
   const findMyCurrentLocation = async () => {
     setIsReady(false);
-    let { status } = await Location.requestForegroundPermissionsAsync();
+    const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
-      console.log('사용자가 동의하지 않아 위치정보를 불러올 수 없습니다.');
       Alert.alert('위치 접근 오류', '설정에 들어가서 위치 접근을 허용해주세요!');
       setIsReady(true);
       return;
@@ -102,11 +175,6 @@ const LocationCategory = () => {
       coords: { longitude, latitude },
     } = await Location.getCurrentPositionAsync({ accuracy: 3 });
 
-    if (longitude < 123 || longitude > 133) {
-      Alert.alert('지원하지 않는 지역입니다!');
-      setIsReady(true);
-      return;
-    }
     await fetch(
       `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${longitude}&y=${latitude}`,
       {
@@ -117,13 +185,45 @@ const LocationCategory = () => {
     )
       .then((res) => res.json())
       .then((json) => {
+        if (!json.documents[0].region_1depth_name) {
+          mapRef.current.animateToRegion({
+            latitude: 37.5518018,
+            longitude: 127.0736345,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+          Alert.alert('지원하지 않는 지역입니다!');
+          setIsReady(true);
+          return;
+        }
         setDetailLocation(json.documents[0]);
         setUserLocation(json.documents[0].address_name);
       })
-      .then(() => setIsReady(true));
+      .then(() => {
+        setUserLongitude(longitude);
+        setUserLatitude(latitude);
+        mapRef.current.animateToRegion(
+          {
+            latitude: latitude,
+            longitude: longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          500
+        );
+      })
+      .then(() => {
+        setIsReady(true);
+      });
   };
-
-  const findSearchLocation = () => {};
+  const onSubmit = () => {
+    const realDetailLocation = { ...detailLocation };
+    realDetailLocation.x = userLongitude;
+    realDetailLocation.y = userLatitude;
+    navigation.navigate('DetectPest', {
+      realDetailLocation,
+    });
+  };
 
   return (
     <>
@@ -131,91 +231,89 @@ const LocationCategory = () => {
         <LoadingGIF source={carrotGIF} />
       </LoadingBackground>
       <TitleWrapper>
-        <Ionicons name="location-outline" size={24} color="#48a346" />
+        <Ionicons name="location-outline" size={24} color="#3B9660" />
         <Title>위치 선택</Title>
       </TitleWrapper>
-      <ChoiceButton
-        onPress={() => {
-          // 현재 위치 찾기 버튼이 눌러져있었다면
-          if (isCurrentLocationClick) {
-            setIsCurrentLocationClick(false);
-            setIsAnyClick(false);
-          } else {
-            // 아무 것도 안 눌러져 있었다면
-            setIsCurrentLocationClick(true);
-            setIsSearchLocationClick(false);
-            setIsAnyClick(true);
-            findMyCurrentLocation();
-          }
-        }}
-        style={
-          isCurrentLocationClick
-            ? { backgroundColor: '#3B9660' }
-            : { backgroundColor: '#eef1f8' }
-        }
-      >
-        <ChoiceTextWrapper>
-          {isCurrentLocationClick ? null : (
+      <ShowContainer style={{ backgroundColor: userLocation ? '#3B9660' : '#eef1f8' }}>
+        <ShowTextWrapper>
+          {!userLocation ? (
             <Ionicons
               name="location-outline"
               size={20}
-              color={'#000'}
+              color={'rgba(0,0,0,0.5)'}
               style={{ marginRight: 5 }}
             />
-          )}
-          <ChoiceText isClick={isCurrentLocationClick}>
-            {isCurrentLocationClick ? userLocation : '현재 위치 찾기'}
-          </ChoiceText>
-        </ChoiceTextWrapper>
-      </ChoiceButton>
-
-      <ChoiceButton
-        onPress={() => {
-          // 검색해서 위치 찾기 버튼이 눌러져있었다면
-          if (isSearchLocationClick) {
-            setIsSearchLocationClick(false);
-            setIsAnyClick(false);
-          } else {
-            // 아무 것도 안 눌러져 있었다면
-            setIsSearchLocationClick(true);
-            setIsCurrentLocationClick(false);
-            setIsAnyClick(true);
-            findSearchLocation();
-          }
-        }}
-        style={
-          isSearchLocationClick
-            ? { backgroundColor: '#3B9660' }
-            : { backgroundColor: '#eef1f8' }
-        }
-      >
-        <ChoiceTextWrapper>
-          {isSearchLocationClick ? null : (
-            <Ionicons
-              name="search-outline"
-              size={20}
-              color={'#000'}
-              style={{ marginRight: 5 }}
+          ) : null}
+          <ShowText isUserLocation={!!userLocation}>
+            {!!userLocation ? userLocation : '내 위치'}
+          </ShowText>
+        </ShowTextWrapper>
+      </ShowContainer>
+      <MapViewBottomContainer>
+        <MapViewContainer>
+          <CurrentLocationButton onPress={findMyCurrentLocation}>
+            <MaterialCommunityIcons
+              name="target"
+              size={30}
+              color="#3B9660"
+              style={{ padding: 3 }}
             />
-          )}
-          <ChoiceText isClick={isSearchLocationClick}>
-            {isSearchLocationClick ? userLocation : '검색해서 위치 찾기'}
-          </ChoiceText>
-        </ChoiceTextWrapper>
-      </ChoiceButton>
-      <BottomContainer isAnyClick={isAnyClick}>
-        <BottomNextButton
-          isAnyClick={isAnyClick}
-          disabled={!isAnyClick}
-          onPress={() => {
-            navigation.navigate('DetectPest', {
-              detailLocation,
-            });
-          }}
-        >
-          <BottomNextText isAnyClick={isAnyClick}>확인</BottomNextText>
-        </BottomNextButton>
-      </BottomContainer>
+          </CurrentLocationButton>
+          <MapView
+            ref={mapRef}
+            style={{ flex: 1 }}
+            userInterfaceStyle="light"
+            showsUserLocation={true}
+            rotateEnabled={false}
+            pitchEnabled={false}
+            onRegionChange={(region) => {
+              setUserRegion(region);
+            }}
+            onRegionChangeComplete={async (region) => {
+              await fetch(
+                `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${region.longitude}&y=${region.latitude}`,
+                {
+                  headers: {
+                    Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
+                  },
+                }
+              )
+                .then((res) => res.json())
+                .then((json) => {
+                  if (!json.documents[0].region_1depth_name) {
+                    mapRef.current.animateToRegion({
+                      latitude: 37.5518018,
+                      longitude: 127.0736345,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    });
+                    Alert.alert('지원하지 않는 지역입니다!');
+                    return;
+                  }
+                  setDetailLocation(json.documents[0]);
+                  setUserLocation(json.documents[0].address_name);
+                });
+            }}
+            initialRegion={{
+              latitude: 37.5518018,
+              longitude: 127.0736345,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
+          >
+            <Marker coordinate={userRegion} image={require('../assets/location5.png')} />
+          </MapView>
+        </MapViewContainer>
+        <BottomContainer isUserLocation={!!userLocation}>
+          <BottomNextButton
+            isUserLocation={!!userLocation}
+            disabled={!userLocation}
+            onPress={onSubmit}
+          >
+            <BottomNextText isUserLocation={!!userLocation}>확인</BottomNextText>
+          </BottomNextButton>
+        </BottomContainer>
+      </MapViewBottomContainer>
     </>
   );
 };
