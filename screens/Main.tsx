@@ -3,6 +3,9 @@ import styled from 'styled-components/native';
 import { Octicons, Ionicons, AntDesign, SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import HeadSeparator from '../components/HeadSeparator';
+import BookMarkButton from '../components/BookMarkButton';
+import carrot from '../assets/carrot.gif';
+import Swiper from 'react-native-swiper';
 
 const Background = styled.View`
   width: 100%;
@@ -119,6 +122,7 @@ const BookMarkWrapper = styled.View``;
 const BookMarkItem = styled.TouchableOpacity`
   width: 100%;
 `;
+const SwiperView = styled.View``;
 
 const Main = () => {
   const navigation = useNavigation();
@@ -127,6 +131,8 @@ const Main = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: 'Map' }] });
   };
+
+  const bookMarkData = [];
 
   const goToDetectPest = () => {
     //@ts-ignore
@@ -189,6 +195,39 @@ const Main = () => {
         </NormalBtnWrapper>
         <VSeparator />
         <Title>즐겨찾는 나의 작물</Title>
+        <Swiper style={{ height: 350 }}>
+          {bookMarkData
+            ? bookMarkData
+                .filter((_, filterIndex) => filterIndex % 3 === 0)
+                .map((_, index) => {
+                  return (
+                    <SwiperView key={index}>
+                      {bookMarkData.map((data, semiIndex) => {
+                        if (
+                          semiIndex === index * 3 ||
+                          semiIndex === index * 3 + 1 ||
+                          semiIndex === index * 3 + 2
+                        ) {
+                          return (
+                            <BookMarkButton
+                              key={semiIndex}
+                              cropImage={carrot}
+                              cropLocation={data.detection_location.address_name}
+                              cropName={data.detection_category}
+                              isCropPest={
+                                data.detection_result.name.includes('정상')
+                                  ? '정상'
+                                  : '병해충 탐지됨'
+                              }
+                            />
+                          );
+                        }
+                      })}
+                    </SwiperView>
+                  );
+                })
+            : null}
+        </Swiper>
         <VSeparator />
         <Title>최근 탐지 기록</Title>
       </Container>
