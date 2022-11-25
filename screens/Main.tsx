@@ -226,7 +226,7 @@ const Main = () => {
         <VSeparator />
         <VSeparator />
         <Title>즐겨찾는 나의 작물</Title>
-        <Swiper style={{ height: bookMarkData ? 350 : 150 }}>
+        <Swiper activeDotColor="#3b9660" style={{ height: bookMarkData ? 350 : 150 }}>
           {bookMarkData ? (
             bookMarkData
               .filter((_, filterIndex) => filterIndex % 3 === 0)
