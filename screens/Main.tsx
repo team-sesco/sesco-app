@@ -123,7 +123,16 @@ const BookMarkItem = styled.TouchableOpacity`
   width: 100%;
 `;
 const SwiperView = styled.View``;
-
+const NoBookMarkView = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+const NoBookMarkText = styled.Text`
+  margin-top: 20px;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+`;
 const Main = () => {
   const navigation = useNavigation();
 
@@ -195,38 +204,43 @@ const Main = () => {
         </NormalBtnWrapper>
         <VSeparator />
         <Title>즐겨찾는 나의 작물</Title>
-        <Swiper style={{ height: 350 }}>
-          {bookMarkData
-            ? bookMarkData
-                .filter((_, filterIndex) => filterIndex % 3 === 0)
-                .map((_, index) => {
-                  return (
-                    <SwiperView key={index}>
-                      {bookMarkData.map((data, semiIndex) => {
-                        if (
-                          semiIndex === index * 3 ||
-                          semiIndex === index * 3 + 1 ||
-                          semiIndex === index * 3 + 2
-                        ) {
-                          return (
-                            <BookMarkButton
-                              key={semiIndex}
-                              cropImage={carrot}
-                              cropLocation={data.detection_location.address_name}
-                              cropName={data.detection_category}
-                              isCropPest={
-                                data.detection_result.name.includes('정상')
-                                  ? '정상'
-                                  : '병해충 탐지됨'
-                              }
-                            />
-                          );
-                        }
-                      })}
-                    </SwiperView>
-                  );
-                })
-            : null}
+        <Swiper style={{ height: bookMarkData ? 350 : 150 }}>
+          {bookMarkData ? (
+            bookMarkData
+              .filter((_, filterIndex) => filterIndex % 3 === 0)
+              .map((_, index) => {
+                return (
+                  <SwiperView key={index}>
+                    {bookMarkData.map((data, semiIndex) => {
+                      if (
+                        semiIndex === index * 3 ||
+                        semiIndex === index * 3 + 1 ||
+                        semiIndex === index * 3 + 2
+                      ) {
+                        return (
+                          <BookMarkButton
+                            key={semiIndex}
+                            cropImage={carrot}
+                            cropLocation={data.detection_location.address_name}
+                            cropName={data.detection_category}
+                            isCropPest={
+                              data.detection_result.name.includes('정상')
+                                ? '정상'
+                                : '병해충 탐지됨'
+                            }
+                          />
+                        );
+                      }
+                    })}
+                  </SwiperView>
+                );
+              })
+          ) : (
+            <NoBookMarkView>
+              <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={40} />
+              <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
+            </NoBookMarkView>
+          )}
         </Swiper>
         <VSeparator />
         <Title>최근 탐지 기록</Title>
