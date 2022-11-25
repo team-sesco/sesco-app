@@ -4,6 +4,7 @@ import BookMarkButton from '../components/BookMarkButton';
 import carrot from '../assets/carrot.gif';
 import HeadSeparator from '../components/HeadSeparator';
 import MainTitle from '../components/MainTitle';
+import { BASE_URI } from '../api/api';
 import { AntDesign } from '@expo/vector-icons';
 
 const Container = styled.View`
@@ -29,6 +30,22 @@ const NoBookMarkText = styled.Text`
 
 const BookMark = ({ jwtToken }) => {
   const [bookMarkData, setBookMarkData] = useState(null);
+
+  useEffect(() => {
+    getAllBookMark();
+  }, []);
+
+  const getAllBookMark = async () => {
+    const response = await fetch(`${BASE_URI}/api/v1/bookmarks`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+    if (response.msg === 'success') {
+      setBookMarkData(response.result);
+    }
+  };
 
   return (
     <>

@@ -163,7 +163,7 @@ const Main = () => {
 
   const goToBookMark = () => {
     //@ts-ignore
-    navigation.navigate('BookMark');
+    navigation.navigate('BookMark', { jwtToken });
   };
 
   const getBookMark = async () => {
