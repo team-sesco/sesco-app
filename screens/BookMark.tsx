@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import BookMarkButton from '../components/BookMarkButton';
 import carrot from '../assets/carrot.gif';
 import HeadSeparator from '../components/HeadSeparator';
 import MainTitle from '../components/MainTitle';
+import { AntDesign } from '@expo/vector-icons';
 
 const Container = styled.View`
   width: 95%;
@@ -11,16 +12,48 @@ const Container = styled.View`
   margin: 0 auto;
 `;
 
-const Wrapper = styled.ScrollView``;
+const Wrapper = styled.ScrollView<{ isBookMark: boolean }>`
+  display: ${(props) => (props.isBookMark ? 'flex' : 'none')};
+`;
 
-const BookMark = () => {
+const NoBookMarkView = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+const NoBookMarkText = styled.Text`
+  margin: 30px 0 200px;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+`;
+
+const BookMark = ({ jwtToken }) => {
+  const [bookMarkData, setBookMarkData] = useState(null);
+
   return (
     <>
       <HeadSeparator />
       <Container>
         <MainTitle text="모든 북마크" />
-        <Wrapper>
+        <Wrapper isBookMark={!!bookMarkData}>
+          {bookMarkData
+            ? bookMarkData.map((data, index) => {
+                <BookMarkButton
+                  key={index}
+                  cropImage={carrot}
+                  cropLocation={data.detection_location.address_name}
+                  cropName={data.detection_category}
+                  isCropPest={
+                    data.detection_result.name.includes('정상') ? '정상' : '병해충 탐지됨'
+                  }
+                />;
+              })
+            : null}
         </Wrapper>
+        <NoBookMarkView>
+          <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={40} />
+          <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
+        </NoBookMarkView>
       </Container>
     </>
   );
