@@ -34,14 +34,6 @@ const LeftHeader = styled.View`
   position: absolute;
   margin-left: 20px;
 `;
-const CenterHeader = styled.View`
-  margin: 0 auto;
-`;
-const TextHeader = styled.Text`
-  font-size: 30px;
-  font-weight: 600;
-  color: #3b9660;
-`;
 const RightHeader = styled.View`
   position: absolute;
   flex-direction: row;
@@ -120,10 +112,6 @@ const Title = styled.Text`
   font-weight: 600;
 `;
 
-const BookMarkWrapper = styled.View``;
-const BookMarkItem = styled.TouchableOpacity`
-  width: 100%;
-`;
 const SwiperView = styled.View``;
 const NoBookMarkView = styled.View`
   flex: 1;
@@ -187,9 +175,6 @@ const Main = () => {
               <Octicons name="three-bars" color="#98A1BD" size={28} />
             </HeaderButton>
           </LeftHeader>
-          <CenterHeader>
-            <TextHeader>SE. SCO</TextHeader>
-          </CenterHeader>
           <RightHeader>
             <HeaderButton>
               <AntDesign
@@ -204,7 +189,6 @@ const Main = () => {
             </HeaderButton>
           </RightHeader>
         </Header>
-        <VSeparator />
         <VSeparator />
         <MainBannerBtn>
           <MainBannerText>SE. SCO를 처음 이용하시나요?</MainBannerText>
