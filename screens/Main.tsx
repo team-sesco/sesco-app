@@ -123,6 +123,17 @@ const NoBookMarkText = styled.Text`
   font-size: 18px;
   color: rgba(0, 0, 0, 0.5);
 `;
+const AllBookMarkButton = styled.TouchableOpacity`
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 10px;
+`;
+const AllBookMarkText = styled.Text`
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-right: 15px;
+`;
 const Main = () => {
   const navigation = useNavigation();
   const [jwtToken, setJwtToken] = useState('');
@@ -253,6 +264,11 @@ const Main = () => {
             </NoBookMarkView>
           )}
         </Swiper>
+        <AllBookMarkButton>
+          <AllBookMarkText>모든 북마크 보러가기</AllBookMarkText>
+          <AntDesign name="right" size={18} color="rgba(0,0,0,0.5)" />
+        </AllBookMarkButton>
+        <VSeparator />
         <VSeparator />
         <Title>최근 탐지 기록</Title>
       </Container>
