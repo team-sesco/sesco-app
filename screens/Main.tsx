@@ -161,6 +161,11 @@ const Main = () => {
     });
   };
 
+  const goToBookMark = () => {
+    //@ts-ignore
+    navigation.navigate('BookMark');
+  };
+
   const getBookMark = async () => {
     const response = await fetch(`${BASE_URI}/api/v1/bookmarks?limit=15`, {
       method: 'GET',
@@ -168,7 +173,6 @@ const Main = () => {
         Authorization: `Bearer ${jwtToken}`,
       },
     }).then((res) => res.json());
-    console.log(response);
 
     if (response.msg === 'success') {
       setBookMarkData(response.result);
@@ -264,7 +268,7 @@ const Main = () => {
             </NoBookMarkView>
           )}
         </Swiper>
-        <AllBookMarkButton>
+        <AllBookMarkButton onPress={goToBookMark}>
           <AllBookMarkText>모든 북마크 보러가기</AllBookMarkText>
           <AntDesign name="right" size={18} color="rgba(0,0,0,0.5)" />
         </AllBookMarkButton>
