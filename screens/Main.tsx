@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { Octicons, Ionicons, AntDesign, SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -6,6 +6,8 @@ import HeadSeparator from '../components/HeadSeparator';
 import BookMarkButton from '../components/BookMarkButton';
 import carrot from '../assets/carrot.gif';
 import Swiper from 'react-native-swiper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BASE_URI } from '../api/api';
 
 const Background = styled.View`
   width: 100%;
@@ -135,19 +137,43 @@ const NoBookMarkText = styled.Text`
 `;
 const Main = () => {
   const navigation = useNavigation();
+  const [jwtToken, setJwtToken] = useState('');
+  const [bookMarkData, setBookMarkData] = useState(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem('jwtToken', (_, result) => {
+      setJwtToken(result);
+    });
+  }, []);
+
+  useEffect(() => {
+    getBookMark();
+  }, [jwtToken]);
 
   const goToMap = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: 'Map' }] });
   };
 
-  const bookMarkData = [];
-
   const goToDetectPest = () => {
     //@ts-ignore
     navigation.navigate('Stack', {
       screen: 'DetectPest',
     });
+  };
+
+  const getBookMark = async () => {
+    const response = await fetch(`${BASE_URI}/api/v1/bookmarks?limit=15`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+    console.log(response);
+
+    if (response.msg === 'success') {
+      setBookMarkData(response.result);
+    }
   };
 
   return (
@@ -202,6 +228,7 @@ const Main = () => {
             <NormalBtnText>지도</NormalBtnText>
           </NormalBtn>
         </NormalBtnWrapper>
+        <VSeparator />
         <VSeparator />
         <Title>즐겨찾는 나의 작물</Title>
         <Swiper style={{ height: bookMarkData ? 350 : 150 }}>
