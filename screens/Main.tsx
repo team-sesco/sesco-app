@@ -32,12 +32,12 @@ const Header = styled.View`
 
 const LeftHeader = styled.View`
   position: absolute;
-  margin-left: 20px;
+  margin-left: 25px;
 `;
 const RightHeader = styled.View`
   position: absolute;
   flex-direction: row;
-  margin-right: 10px;
+  margin-right: 20px;
   right: 0px;
 `;
 const HeaderButton = styled.TouchableOpacity``;
@@ -181,30 +181,30 @@ const Main = () => {
 
   return (
     <Background>
+      <HeadSeparator />
+      <VSeparator />
+      <Header>
+        <LeftHeader>
+          <HeaderButton onPress={() => navigation.openDrawer()}>
+            <Octicons name="three-bars" color="#98A1BD" size={28} />
+          </HeaderButton>
+        </LeftHeader>
+        <RightHeader>
+          <HeaderButton>
+            <AntDesign
+              name="search1"
+              color="#98A1BD"
+              size={28}
+              style={{ marginRight: 15 }}
+            />
+          </HeaderButton>
+          <HeaderButton>
+            <SimpleLineIcons name="bell" color="#98A1BD" size={28} />
+          </HeaderButton>
+        </RightHeader>
+      </Header>
+      <VSeparator />
       <Container>
-        <HeadSeparator />
-        <VSeparator />
-        <Header>
-          <LeftHeader>
-            <HeaderButton onPress={() => navigation.openDrawer()}>
-              <Octicons name="three-bars" color="#98A1BD" size={28} />
-            </HeaderButton>
-          </LeftHeader>
-          <RightHeader>
-            <HeaderButton>
-              <AntDesign
-                name="search1"
-                color="#98A1BD"
-                size={28}
-                style={{ marginRight: 15 }}
-              />
-            </HeaderButton>
-            <HeaderButton>
-              <SimpleLineIcons name="bell" color="#98A1BD" size={28} />
-            </HeaderButton>
-          </RightHeader>
-        </Header>
-        <VSeparator />
         <MainBannerBtn>
           <MainBannerText>SE. SCO를 처음 이용하시나요?</MainBannerText>
           <MainBannerText2>이용 방법</MainBannerText2>
