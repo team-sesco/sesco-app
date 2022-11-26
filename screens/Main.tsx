@@ -145,6 +145,7 @@ const AllBookMarkButton = styled.TouchableOpacity`
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
+  margin: 0 auto;
   margin-right: 10px;
 `;
 const AllBookMarkText = styled.Text`
