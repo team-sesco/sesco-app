@@ -8,6 +8,7 @@ import carrot from '../assets/carrot.gif';
 import Swiper from 'react-native-swiper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
+import * as WebBrowser from 'expo-web-browser';
 
 const Background = styled.View`
   width: 100%;
@@ -149,6 +150,12 @@ const Main = () => {
     getBookMark();
   }, [jwtToken]);
 
+  const openLink = async () => {
+    await WebBrowser.openBrowserAsync(
+      'https://brass-payment-372.notion.site/SE-SCO-50712a119a774442bc982b161948c6e2'
+    );
+  };
+
   const goToMap = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: 'Map' }] });
@@ -204,8 +211,8 @@ const Main = () => {
         </RightHeader>
       </Header>
       <VSeparator />
-      <Container>
-        <MainBannerBtn>
+      <Container showsVerticalScrollIndicator={false}>
+        <MainBannerBtn onPress={() => openLink()}>
           <MainBannerText>SE. SCO를 처음 이용하시나요?</MainBannerText>
           <MainBannerText2>이용 방법</MainBannerText2>
           <Ionicons name="chevron-forward" color="#98A1BD" size={24} />
