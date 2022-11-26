@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
 import CurrentDetectButton from '../components/CurrentDetectButton';
 import * as WebBrowser from 'expo-web-browser';
+import { Alert } from 'react-native';
 
 const Background = styled.View`
   width: 100%;
@@ -224,130 +225,152 @@ const Main = () => {
       });
   };
 
+  const goToDetectResult = async (detectionId) => {
+    const response = await fetch(`${BASE_URI}/api/v1/detection/${detectionId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      navigation.navigate('AlreadyDetectPestResult', {
+        response,
+      });
+      return;
+    }
+    Alert.alert('잠시 후 다시 시도해주세요!');
+  };
+
   return (
-    <Background>
-      <HeadSeparator />
-      <VSeparator />
-      <Header>
-        <LeftHeader>
-          <HeaderButton onPress={() => navigation.openDrawer()}>
-            <Octicons name="three-bars" color="#98A1BD" size={28} />
-          </HeaderButton>
-        </LeftHeader>
-        <RightHeader>
-          <HeaderButton>
-            <AntDesign
-              name="search1"
-              color="#98A1BD"
-              size={28}
-              style={{ marginRight: 15 }}
-            />
-          </HeaderButton>
-          <HeaderButton>
-            <SimpleLineIcons name="bell" color="#98A1BD" size={28} />
-          </HeaderButton>
-        </RightHeader>
-      </Header>
-      <VSeparator />
-      <Container showsVerticalScrollIndicator={false}>
-        <MainBannerBtn onPress={() => openLink()}>
-          <MainBannerText>SE. SCO를 처음 이용하시나요?</MainBannerText>
-          <MainBannerText2>이용 방법</MainBannerText2>
-          <Ionicons name="chevron-forward" color="#98A1BD" size={24} />
-        </MainBannerBtn>
+    <>
+      <Background>
+        <HeadSeparator />
         <VSeparator />
-        <DetectPestBtn onPress={goToDetectPest}>
-          <DetectPestInnerBorder>
-            <DetectPestText>병해충 탐지하기</DetectPestText>
-          </DetectPestInnerBorder>
-        </DetectPestBtn>
-        <VSeparator />
-        <NormalBtnWrapper>
-          <NormalBtn>
-            <Ionicons name="home-outline" color="#48a346" size={24} />
-            <NormalBtnText>내 농작물</NormalBtnText>
-          </NormalBtn>
-          <NormalBtn onPress={goToMap}>
-            <Ionicons name="map-outline" color="#48a346" size={24} />
-            <NormalBtnText>지도</NormalBtnText>
-          </NormalBtn>
-        </NormalBtnWrapper>
-        <VSeparator />
-        <VSeparator />
-        <Title>즐겨찾는 나의 작물</Title>
-        <Swiper
-          activeDotColor="#3b9660"
-          style={{ height: bookMarkData.length !== 0 ? 350 : 150 }}
-        >
-          {bookMarkData.length !== 0 ? (
-            bookMarkData
-              .filter((_, filterIndex) => filterIndex % 3 === 0)
-              .map((_, index) => {
-                return (
-                  <SwiperView key={index}>
-                    {bookMarkData.map((data, semiIndex) => {
-                      if (
-                        semiIndex === index * 3 ||
-                        semiIndex === index * 3 + 1 ||
-                        semiIndex === index * 3 + 2
-                      ) {
-                        return (
-                          <BookMarkButton
-                            key={semiIndex}
-                            cropImage={carrot}
-                            cropLocation={data.detection_location.address_name}
-                            cropName={data.detection_category}
-                            isCropPest={
-                              data.detection_result.name.includes('정상')
-                                ? '정상'
-                                : '병해충 탐지됨'
-                            }
-                          />
-                        );
-                      }
-                    })}
-                  </SwiperView>
-                );
-              })
-          ) : (
-            <NoBookMarkView>
-              <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
-              <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
-            </NoBookMarkView>
-          )}
-        </Swiper>
-        <AllBookMarkButton onPress={goToBookMark}>
-          <AllBookMarkText>모든 북마크 보러가기</AllBookMarkText>
-          <AntDesign name="right" size={18} color="rgba(0,0,0,0.5)" />
-        </AllBookMarkButton>
-        <VSeparator />
-        <VSeparator />
-        <Title>최근 탐지 기록</Title>
-        {detectData.length !== 0 ? (
-          <SlideView
-            horizontal
-            data={detectData}
-            renderItem={({ item }) => (
-              <CurrentDetectButton
-                cropPest={item.model_result.name}
-                cropLocation={item.location.address_name}
-                cropDate={item.created_at.slice(0, item.created_at.indexOf('일') + 1)}
+        <Header>
+          <LeftHeader>
+            <HeaderButton onPress={() => navigation.openDrawer()}>
+              <Octicons name="three-bars" color="#98A1BD" size={28} />
+            </HeaderButton>
+          </LeftHeader>
+          <RightHeader>
+            <HeaderButton>
+              <AntDesign
+                name="search1"
+                color="#98A1BD"
+                size={28}
+                style={{ marginRight: 15 }}
               />
+            </HeaderButton>
+            <HeaderButton>
+              <SimpleLineIcons name="bell" color="#98A1BD" size={28} />
+            </HeaderButton>
+          </RightHeader>
+        </Header>
+        <VSeparator />
+        <Container showsVerticalScrollIndicator={false}>
+          <MainBannerBtn onPress={() => openLink()}>
+            <MainBannerText>SE. SCO를 처음 이용하시나요?</MainBannerText>
+            <MainBannerText2>이용 방법</MainBannerText2>
+            <Ionicons name="chevron-forward" color="#98A1BD" size={24} />
+          </MainBannerBtn>
+          <VSeparator />
+          <DetectPestBtn onPress={goToDetectPest}>
+            <DetectPestInnerBorder>
+              <DetectPestText>병해충 탐지하기</DetectPestText>
+            </DetectPestInnerBorder>
+          </DetectPestBtn>
+          <VSeparator />
+          <NormalBtnWrapper>
+            <NormalBtn>
+              <Ionicons name="home-outline" color="#48a346" size={24} />
+              <NormalBtnText>내 농작물</NormalBtnText>
+            </NormalBtn>
+            <NormalBtn onPress={goToMap}>
+              <Ionicons name="map-outline" color="#48a346" size={24} />
+              <NormalBtnText>지도</NormalBtnText>
+            </NormalBtn>
+          </NormalBtnWrapper>
+          <VSeparator />
+          <VSeparator />
+          <Title>즐겨찾는 나의 작물</Title>
+          <Swiper
+            activeDotColor="#3b9660"
+            style={{ height: bookMarkData.length !== 0 ? 350 : 150 }}
+          >
+            {bookMarkData.length !== 0 ? (
+              bookMarkData
+                .filter((_, filterIndex) => filterIndex % 3 === 0)
+                .map((_, index) => {
+                  return (
+                    <SwiperView key={index}>
+                      {bookMarkData.map((data, semiIndex) => {
+                        if (
+                          semiIndex === index * 3 ||
+                          semiIndex === index * 3 + 1 ||
+                          semiIndex === index * 3 + 2
+                        ) {
+                          return (
+                            <BookMarkButton
+                              key={semiIndex}
+                              cropImage={carrot}
+                              cropLocation={data.detection_location.address_name}
+                              cropName={data.detection_category}
+                              isCropPest={
+                                data.detection_result.name.includes('정상')
+                                  ? '정상'
+                                  : '병해충 탐지됨'
+                              }
+                            />
+                          );
+                        }
+                      })}
+                    </SwiperView>
+                  );
+                })
+            ) : (
+              <NoBookMarkView>
+                <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
+                <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
+              </NoBookMarkView>
             )}
-            keyExtractor={(_, index) => index.toString()}
-            showsHorizontalScrollIndicator={false}
-            ItemSeparatorComponent={WidthSeparator}
-          />
-        ) : (
-          <NoCurrentDetectView>
-            <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
-            <NoCurrentDetectText>탐지된 기록이 없습니다.</NoCurrentDetectText>
-          </NoCurrentDetectView>
-        )}
-      </Container>
-      <VSeparator />
-      <VSeparator />
-    </Background>
+          </Swiper>
+          <AllBookMarkButton onPress={goToBookMark}>
+            <AllBookMarkText>모든 북마크 보러가기</AllBookMarkText>
+            <AntDesign name="right" size={18} color="rgba(0,0,0,0.5)" />
+          </AllBookMarkButton>
+          <VSeparator />
+          <VSeparator />
+          <Title>최근 탐지 기록</Title>
+          {detectData.length !== 0 ? (
+            <SlideView
+              horizontal
+              data={detectData}
+              renderItem={({ item }) => (
+                <CurrentDetectButton
+                  onPress={() => {
+                    goToDetectResult(item._id);
+                  }}
+                  cropPest={item.model_result.name}
+                  cropLocation={item.location.address_name}
+                  cropDate={item.created_at.slice(0, item.created_at.indexOf('일') + 1)}
+                />
+              )}
+              keyExtractor={(_, index) => index.toString()}
+              showsHorizontalScrollIndicator={false}
+              ItemSeparatorComponent={WidthSeparator}
+            />
+          ) : (
+            <NoCurrentDetectView>
+              <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
+              <NoCurrentDetectText>탐지된 기록이 없습니다.</NoCurrentDetectText>
+            </NoCurrentDetectView>
+          )}
+        </Container>
+        <VSeparator />
+        <VSeparator />
+      </Background>
+    </>
   );
 };
 
