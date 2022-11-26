@@ -117,6 +117,7 @@ const AlreadyDetectPestResult = ({
         result: {
           _id: detection_oid,
           created_at,
+          is_bookmarked,
           img: photoUri,
           location: { address_name: userLocation, x: longitude, y: latitude },
           model_result: { name: pestResult, unidentified, img: visualUri, ratio },
@@ -129,7 +130,7 @@ const AlreadyDetectPestResult = ({
 }) => {
   const [jwtToken, setJwtToken] = useState('');
   const scrollViewRef = useRef();
-  const [isBookMark, setIsBookMark] = useState(false);
+  const [isBookMark, setIsBookMark] = useState(is_bookmarked);
   const [isFontSize, setIsFontSize] = useState(false);
   const { width: PHONE_WIDTH } = Dimensions.get('window');
   const [isResult, setIsResult] = useState(true);
