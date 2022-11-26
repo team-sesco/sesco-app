@@ -317,11 +317,31 @@ const DetectPestResult = ({
   const repeatResult = () => {
     const tempChatsArr = [...chatsArr];
     tempChatsArr.push({ type: 'human', text: '결과 내용 다시 보여주세요!' });
-    tempChatsArr.push({
-      type: 'bot',
-      text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
-      point: pestResult,
-    });
+    if (pestResult.includes('정상')) {
+      tempChatsArr.push({
+        type: 'bot',
+        text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 탐지된 병해충이 없습니다.`,
+      });
+
+      if (unidentified) {
+        tempChatsArr.push({
+          type: 'bot',
+          text: '이 작물은 SE. SCO AI가 판단하기 어려운 병해충인 것 같아요! 전문가의 도움을 요청해보세요.',
+        });
+      }
+    } else {
+      tempChatsArr.push({
+        type: 'bot',
+        text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
+        point: pestResult,
+      });
+      if (unidentified) {
+        tempChatsArr.push({
+          type: 'bot',
+          text: '이 작물은 SE. SCO AI가 모르는 병해충인 것 같아요! 전문가의 도움을 요청해보세요.',
+        });
+      }
+    }
     setChatsArr([...tempChatsArr]);
   };
 
