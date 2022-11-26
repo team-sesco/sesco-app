@@ -137,7 +137,7 @@ const AllBookMarkText = styled.Text`
 const Main = () => {
   const navigation = useNavigation();
   const [jwtToken, setJwtToken] = useState('');
-  const [bookMarkData, setBookMarkData] = useState(null);
+  const [bookMarkData, setBookMarkData] = useState([]);
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
@@ -230,8 +230,11 @@ const Main = () => {
         <VSeparator />
         <VSeparator />
         <Title>즐겨찾는 나의 작물</Title>
-        <Swiper activeDotColor="#3b9660" style={{ height: bookMarkData ? 350 : 150 }}>
-          {bookMarkData ? (
+        <Swiper
+          activeDotColor="#3b9660"
+          style={{ height: bookMarkData.length !== 0 ? 350 : 150 }}
+        >
+          {bookMarkData.length !== 0 ? (
             bookMarkData
               .filter((_, filterIndex) => filterIndex % 3 === 0)
               .map((_, index) => {
