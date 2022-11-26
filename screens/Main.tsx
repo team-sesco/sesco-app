@@ -137,6 +137,10 @@ const AllBookMarkText = styled.Text`
   margin-right: 15px;
 `;
 
+const SlideView = styled.FlatList`
+  margin-top: 15px;
+`;
+
 const NoCurrentDetectView = styled.View`
   align-items: center;
   justify-content: center;
@@ -146,6 +150,10 @@ const NoCurrentDetectText = styled.Text`
   margin-top: 20px;
   font-size: 18px;
   color: rgba(0, 0, 0, 0.5);
+`;
+
+const WidthSeparator = styled.View`
+  width: 10px;
 `;
 
 const Main = () => {
@@ -316,16 +324,20 @@ const Main = () => {
         <VSeparator />
         <Title>최근 탐지 기록</Title>
         {detectData.length !== 0 ? (
-          detectData.map((data, index) => {
-            return (
+          <SlideView
+            horizontal
+            data={detectData}
+            renderItem={({ item }) => (
               <CurrentDetectButton
-                key={index}
-                cropPest={data.model_result.name}
-                cropLocation={data.location.address_name}
-                cropDate={data.created_at.slice(0, data.created_at.indexOf('일') + 1)}
+                cropPest={item.model_result.name}
+                cropLocation={item.location.address_name}
+                cropDate={item.created_at.slice(0, item.created_at.indexOf('일') + 1)}
               />
-            );
-          })
+            )}
+            keyExtractor={(_, index) => index.toString()}
+            showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={WidthSeparator}
+          />
         ) : (
           <NoCurrentDetectView>
             <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
@@ -333,6 +345,8 @@ const Main = () => {
           </NoCurrentDetectView>
         )}
       </Container>
+      <VSeparator />
+      <VSeparator />
     </Background>
   );
 };
