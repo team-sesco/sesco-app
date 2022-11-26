@@ -131,7 +131,7 @@ const DetectPestResult = ({
       response: {
         result: {
           created_at,
-          detection_oid: visualNumber,
+          detection_oid,
           location: userLocation,
           model_result: { name: pestResult, unidentified },
           user_name: userName,
@@ -204,7 +204,7 @@ const DetectPestResult = ({
     setIsReady(false);
 
     const response = await fetch(
-      `${BASE_URI}/api/v1/detection/visualize/${visualNumber}`,
+      `${BASE_URI}/api/v1/detection/visualize/${detection_oid}`,
       {
         method: 'POST',
         body: JSON.stringify({
@@ -235,17 +235,39 @@ const DetectPestResult = ({
     }
   };
 
-  const initBookMark = () => {
+  const initBookMark = async () => {
     const tempChatsArr = [...chatsArr];
     if (isBookMark) {
+      await fetch(`${BASE_URI}/api/v1/bookmarks/${detection_oid}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }).then((res) => console.log(res.json()));
+
       tempChatsArr.push({ type: 'human', text: '북마크 해제해주세요!' });
       tempChatsArr.push({ type: 'bot', text: '북마크 해제하였습니다.' });
       setChatsArr([...tempChatsArr]);
       setIsBookMark(false);
       return;
     }
+
+    const response = await fetch(`${BASE_URI}/api/v1/bookmarks/${detection_oid}`, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
     tempChatsArr.push({ type: 'human', text: '북마크 등록해주세요!' });
-    tempChatsArr.push({ type: 'bot', text: '북마크 등록하였습니다.' });
+
+    if (response.msg === 'created') {
+      tempChatsArr.push({ type: 'bot', text: '북마크 등록하였습니다.' });
+    } else {
+      tempChatsArr.push({ type: 'bot', text: '이미 북마크가 등록되었습니다.' });
+    }
+
     setChatsArr([...tempChatsArr]);
     setIsBookMark(true);
   };
