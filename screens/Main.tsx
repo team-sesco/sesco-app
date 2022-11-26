@@ -8,6 +8,7 @@ import carrot from '../assets/carrot.gif';
 import Swiper from 'react-native-swiper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
+import CurrentDetectButton from '../components/CurrentDetectButton';
 import * as WebBrowser from 'expo-web-browser';
 
 const Background = styled.View`
@@ -135,10 +136,23 @@ const AllBookMarkText = styled.Text`
   color: rgba(0, 0, 0, 0.5);
   margin-right: 15px;
 `;
+
+const NoCurrentDetectView = styled.View`
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+`;
+const NoCurrentDetectText = styled.Text`
+  margin-top: 20px;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+`;
+
 const Main = () => {
   const navigation = useNavigation();
   const [jwtToken, setJwtToken] = useState('');
   const [bookMarkData, setBookMarkData] = useState([]);
+  const [detectData, setDetectData] = useState([]);
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
@@ -148,6 +162,7 @@ const Main = () => {
 
   useEffect(() => {
     getBookMark();
+    getDetectCrop();
   }, [jwtToken]);
 
   const openLink = async () => {
@@ -184,6 +199,21 @@ const Main = () => {
     if (response.msg === 'success') {
       setBookMarkData(response.result);
     }
+  };
+
+  const getDetectCrop = async () => {
+    await fetch(`${BASE_URI}/api/v1/detection?limit=10`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response.msg === 'success') {
+          setDetectData(response.result);
+        }
+      });
   };
 
   return (
@@ -285,6 +315,23 @@ const Main = () => {
         <VSeparator />
         <VSeparator />
         <Title>최근 탐지 기록</Title>
+        {detectData.length !== 0 ? (
+          detectData.map((data, index) => {
+            return (
+              <CurrentDetectButton
+                key={index}
+                cropPest={data.model_result.name}
+                cropLocation={data.location.address_name}
+                cropDate={data.created_at.slice(0, data.created_at.indexOf('일') + 1)}
+              />
+            );
+          })
+        ) : (
+          <NoCurrentDetectView>
+            <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
+            <NoCurrentDetectText>탐지된 기록이 없습니다.</NoCurrentDetectText>
+          </NoCurrentDetectView>
+        )}
       </Container>
     </Background>
   );
