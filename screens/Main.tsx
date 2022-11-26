@@ -263,7 +263,7 @@ const Main = () => {
               })
           ) : (
             <NoBookMarkView>
-              <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={40} />
+              <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
               <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
             </NoBookMarkView>
           )}
