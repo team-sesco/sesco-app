@@ -39,9 +39,9 @@ const ArrowBox = styled.View`
   right: 20px;
 `;
 
-const BookMarkButton = ({ cropImage, cropLocation, cropName, isCropPest }) => {
+const BookMarkButton = ({ onPress, cropImage, cropLocation, cropName, isCropPest }) => {
   return (
-    <Container>
+    <Container onPress={onPress}>
       <CropImage source={cropImage} />
       <CropTextWrapper>
         <CropLocation>{cropLocation}</CropLocation>

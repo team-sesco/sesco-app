@@ -334,6 +334,9 @@ const Main = () => {
                         ) {
                           return (
                             <BookMarkButton
+                              onPress={() => {
+                                goToDetectResult(data.detection_id);
+                              }}
                               key={semiIndex}
                               cropImage={carrot}
                               cropLocation={data.detection_location.address_name}

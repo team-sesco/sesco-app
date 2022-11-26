@@ -39,6 +39,11 @@ const PestModeText = styled.Text<{ isActivate: boolean }>`
   color: ${(props) => (props.isActivate ? '#000' : 'rgba(0,0,0,0.5)')};
   margin-bottom: 10px;
 `;
+const VisualText = styled.Text`
+  font-size: 20px;
+  font-weight: 600;
+  margin: 15px 10px 5px;
+`;
 const ScrollViewContainer = styled.ScrollView<{ display: boolean; isResult: boolean }>`
   display: ${(props) => (props.display ? 'flex' : 'none')};
   width: 95%;
@@ -378,6 +383,7 @@ const AlreadyDetectPestResult = ({
         isResult={isResult}
         showsVerticalScrollIndicator={false}
       >
+        <VisualText>병해충 정확도</VisualText>
         <BarChart
           data={graphData}
           width={PHONE_WIDTH}
@@ -395,6 +401,7 @@ const AlreadyDetectPestResult = ({
           showBarTops={true}
           showValuesOnTopOfBars={true}
         />
+        <VisualText>근처 병해충 정보</VisualText>
         <MapView
           style={{ height: PHONE_WIDTH }}
           userInterfaceStyle="light"
