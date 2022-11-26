@@ -12,6 +12,21 @@ import CurrentDetectButton from '../components/CurrentDetectButton';
 import * as WebBrowser from 'expo-web-browser';
 import { Alert } from 'react-native';
 
+const LoadingBackground = styled.View<{ isLoading: boolean }>`
+  position: absolute;
+  z-index: 10;
+  display: ${(props) => (props.isLoading ? 'flex' : 'none')};
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+`;
+const LoadingGIF = styled.Image`
+  width: 120px;
+  height: 120px;
+`;
+
 const Background = styled.View`
   width: 100%;
   height: 100%;
@@ -160,6 +175,7 @@ const WidthSeparator = styled.View`
 const Main = () => {
   const navigation = useNavigation();
   const [jwtToken, setJwtToken] = useState('');
+  const [isReady, setIsReady] = useState(true);
   const [bookMarkData, setBookMarkData] = useState([]);
   const [detectData, setDetectData] = useState([]);
 
@@ -226,6 +242,7 @@ const Main = () => {
   };
 
   const goToDetectResult = async (detectionId) => {
+    setIsReady(false);
     const response = await fetch(`${BASE_URI}/api/v1/detection/${detectionId}`, {
       method: 'GET',
       headers: {
@@ -237,13 +254,18 @@ const Main = () => {
       navigation.navigate('AlreadyDetectPestResult', {
         response,
       });
+      setIsReady(true);
       return;
     }
+    setIsReady(true);
     Alert.alert('잠시 후 다시 시도해주세요!');
   };
 
   return (
     <>
+      <LoadingBackground isLoading={!isReady}>
+        <LoadingGIF source={require('../assets/pa.gif')} />
+      </LoadingBackground>
       <Background>
         <HeadSeparator />
         <VSeparator />
