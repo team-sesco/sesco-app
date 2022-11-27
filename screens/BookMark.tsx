@@ -38,6 +38,7 @@ const Container = styled.View`
 
 const Wrapper = styled.ScrollView<{ isBookMark: boolean }>`
   display: ${(props) => (props.isBookMark ? 'flex' : 'none')};
+  margin-bottom: 80px;
 `;
 
 const NoBookMarkView = styled.View`
