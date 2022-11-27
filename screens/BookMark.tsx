@@ -14,6 +14,21 @@ import { AntDesign } from '@expo/vector-icons';
 import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+const LoadingBackground = styled.View<{ isLoading: boolean }>`
+  position: absolute;
+  z-index: 10;
+  display: ${(props) => (props.isLoading ? 'flex' : 'none')};
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+`;
+const LoadingGIF = styled.Image`
+  width: 120px;
+  height: 120px;
+`;
+
 const Container = styled.View`
   width: 95%;
   height: 100%;
@@ -85,6 +100,9 @@ const BookMark = ({
 
   return (
     <>
+      <LoadingBackground isLoading={!isReady}>
+        <LoadingGIF source={require('../assets/pa.gif')} />
+      </LoadingBackground>
       <HeadSeparator />
       <Container>
         <MainTitle text="모든 북마크" />
