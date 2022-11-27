@@ -7,6 +7,7 @@ import Drawer from './Drawer';
 import Map from '../screens/Map';
 import BookMark from '../screens/BookMark';
 import AlreadyDetectPestResult from '../screens/AlreadyDetectPestResult';
+import MyDetection from '../screens/MyDetection';
 
 const Nav = createNativeStackNavigator();
 
@@ -24,6 +25,7 @@ const Root = ({ jwtToken }) => {
       <Nav.Screen name="Drawer" component={Drawer} />
       <Nav.Screen name="Map" component={Map} />
       <Nav.Screen name="Stack" component={Stack} />
+      <Nav.Screen name="MyDetection" component={MyDetection} />
       <Nav.Screen name="DetectPestResult" component={DetectPestResult} />
       <Nav.Screen name="AlreadyDetectPestResult" component={AlreadyDetectPestResult} />
       <Nav.Screen name="BookMark" component={BookMark} />

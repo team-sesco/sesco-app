@@ -202,6 +202,11 @@ const Main = () => {
     );
   };
 
+  const goToMyDetection = () => {
+    //@ts-ignore
+    navigation.navigate('MyDetection', { jwtToken });
+  };
+
   const goToMap = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: 'Map' }] });
@@ -311,9 +316,9 @@ const Main = () => {
           </DetectPestBtn>
           <VSeparator />
           <NormalBtnWrapper>
-            <NormalBtn>
+            <NormalBtn onPress={goToMyDetection}>
               <Ionicons name="home-outline" color="#48a346" size={24} />
-              <NormalBtnText>내 농작물</NormalBtnText>
+              <NormalBtnText>탐지 목록</NormalBtnText>
             </NormalBtn>
             <NormalBtn onPress={goToMap}>
               <Ionicons name="map-outline" color="#48a346" size={24} />
