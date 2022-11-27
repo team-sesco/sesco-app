@@ -1,8 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { Octicons, Ionicons, AntDesign, SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import HeadSeparator from '../components/HeadSeparator';
+import BookMarkButton from '../components/BookMarkButton';
+import carrot from '../assets/carrot.gif';
+import gochuImg from '../assets/gochu.png';
+import muImg from '../assets/mu.png';
+import baechuImg from '../assets/baechu.png';
+import kongImg from '../assets/kong.png';
+import paImg from '../assets/pa.png';
+import Swiper from 'react-native-swiper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BASE_URI } from '../api/api';
+import CurrentDetectButton from '../components/CurrentDetectButton';
+import * as WebBrowser from 'expo-web-browser';
+import { Alert } from 'react-native';
+
+const LoadingBackground = styled.View<{ isLoading: boolean }>`
+  position: absolute;
+  z-index: 10;
+  display: ${(props) => (props.isLoading ? 'flex' : 'none')};
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+`;
+const LoadingGIF = styled.Image`
+  width: 120px;
+  height: 120px;
+`;
 
 const Background = styled.View`
   width: 100%;
@@ -27,20 +55,12 @@ const Header = styled.View`
 
 const LeftHeader = styled.View`
   position: absolute;
-  margin-left: 20px;
-`;
-const CenterHeader = styled.View`
-  margin: 0 auto;
-`;
-const TextHeader = styled.Text`
-  font-size: 30px;
-  font-weight: 600;
-  color: #3b9660;
+  margin-left: 25px;
 `;
 const RightHeader = styled.View`
   position: absolute;
   flex-direction: row;
-  margin-right: 10px;
+  margin-right: 20px;
   right: 0px;
 `;
 const HeaderButton = styled.TouchableOpacity``;
@@ -115,13 +135,77 @@ const Title = styled.Text`
   font-weight: 600;
 `;
 
-const BookMarkWrapper = styled.View``;
-const BookMarkItem = styled.TouchableOpacity`
-  width: 100%;
+const SwiperView = styled.View``;
+const NoBookMarkView = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+const NoBookMarkText = styled.Text`
+  margin-top: 20px;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+`;
+const AllBookMarkButton = styled.TouchableOpacity`
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0 auto;
+  margin-right: 10px;
+`;
+const AllBookMarkText = styled.Text`
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-right: 15px;
+`;
+
+const SlideView = styled.FlatList`
+  margin-top: 15px;
+`;
+
+const NoCurrentDetectView = styled.View`
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+`;
+const NoCurrentDetectText = styled.Text`
+  margin-top: 20px;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+`;
+
+const WidthSeparator = styled.View`
+  width: 10px;
 `;
 
 const Main = () => {
   const navigation = useNavigation();
+  const [jwtToken, setJwtToken] = useState('');
+  const [isReady, setIsReady] = useState(true);
+  const [bookMarkData, setBookMarkData] = useState([]);
+  const [detectData, setDetectData] = useState([]);
+
+  useEffect(() => {
+    AsyncStorage.getItem('jwtToken', (_, result) => {
+      setJwtToken(result);
+    });
+  }, []);
+
+  useEffect(() => {
+    getBookMark();
+    getDetectCrop();
+  }, [jwtToken]);
+
+  const openLink = async () => {
+    await WebBrowser.openBrowserAsync(
+      'https://brass-payment-372.notion.site/SE-SCO-50712a119a774442bc982b161948c6e2'
+    );
+  };
+
+  const goToMyDetection = () => {
+    //@ts-ignore
+    navigation.navigate('MyDetection', { jwtToken });
+  };
 
   const goToMap = () => {
     //@ts-ignore
@@ -135,9 +219,66 @@ const Main = () => {
     });
   };
 
+  const goToBookMark = () => {
+    //@ts-ignore
+    navigation.navigate('BookMark', { jwtToken });
+  };
+
+  const getBookMark = async () => {
+    const response = await fetch(`${BASE_URI}/api/v1/bookmarks?limit=15`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      setBookMarkData(response.result);
+    }
+  };
+
+  const getDetectCrop = async () => {
+    await fetch(`${BASE_URI}/api/v1/detection?limit=10`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response.msg === 'success') {
+          setDetectData(response.result);
+        }
+      });
+  };
+
+  const goToDetectResult = async (detectionId) => {
+    setIsReady(false);
+    const response = await fetch(`${BASE_URI}/api/v1/detection/${detectionId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      navigation.navigate('AlreadyDetectPestResult', {
+        response,
+      });
+
+      setIsReady(true);
+      return;
+    }
+    setIsReady(true);
+    Alert.alert('잠시 후 다시 시도해주세요!');
+  };
+
   return (
-    <Background>
-      <Container>
+    <>
+      <LoadingBackground isLoading={!isReady}>
+        <LoadingGIF source={require('../assets/pa.gif')} />
+      </LoadingBackground>
+      <Background>
         <HeadSeparator />
         <VSeparator />
         <Header>
@@ -146,9 +287,6 @@ const Main = () => {
               <Octicons name="three-bars" color="#98A1BD" size={28} />
             </HeaderButton>
           </LeftHeader>
-          <CenterHeader>
-            <TextHeader>SE. SCO</TextHeader>
-          </CenterHeader>
           <RightHeader>
             <HeaderButton>
               <AntDesign
@@ -164,35 +302,133 @@ const Main = () => {
           </RightHeader>
         </Header>
         <VSeparator />
+        <Container showsVerticalScrollIndicator={false}>
+          <MainBannerBtn onPress={() => openLink()}>
+            <MainBannerText>SE. SCO를 처음 이용하시나요?</MainBannerText>
+            <MainBannerText2>이용 방법</MainBannerText2>
+            <Ionicons name="chevron-forward" color="#98A1BD" size={24} />
+          </MainBannerBtn>
+          <VSeparator />
+          <DetectPestBtn onPress={goToDetectPest}>
+            <DetectPestInnerBorder>
+              <DetectPestText>병해충 탐지하기</DetectPestText>
+            </DetectPestInnerBorder>
+          </DetectPestBtn>
+          <VSeparator />
+          <NormalBtnWrapper>
+            <NormalBtn onPress={goToMyDetection}>
+              <Ionicons name="home-outline" color="#48a346" size={24} />
+              <NormalBtnText>탐지 목록</NormalBtnText>
+            </NormalBtn>
+            <NormalBtn onPress={goToMap}>
+              <Ionicons name="map-outline" color="#48a346" size={24} />
+              <NormalBtnText>지도</NormalBtnText>
+            </NormalBtn>
+          </NormalBtnWrapper>
+          <VSeparator />
+          <VSeparator />
+          <Title>즐겨찾는 나의 작물</Title>
+          <Swiper
+            activeDotColor="#3b9660"
+            style={{
+              height:
+                bookMarkData.length === 0
+                  ? 150
+                  : bookMarkData.length === 1
+                  ? 150
+                  : bookMarkData.length === 2
+                  ? 250
+                  : 350,
+            }}
+          >
+            {bookMarkData.length !== 0 ? (
+              bookMarkData
+                .filter((_, filterIndex) => filterIndex % 3 === 0)
+                .map((_, index) => {
+                  return (
+                    <SwiperView key={index}>
+                      {bookMarkData.map((data, semiIndex) => {
+                        if (
+                          semiIndex === index * 3 ||
+                          semiIndex === index * 3 + 1 ||
+                          semiIndex === index * 3 + 2
+                        ) {
+                          return (
+                            <BookMarkButton
+                              onPress={() => {
+                                goToDetectResult(data.detection_id);
+                              }}
+                              key={semiIndex}
+                              cropImage={
+                                data.detection_category === '고추'
+                                  ? gochuImg
+                                  : data.detection_category === '무'
+                                  ? muImg
+                                  : data.detection_category === '배추'
+                                  ? baechuImg
+                                  : data.detection_category === '콩'
+                                  ? kongImg
+                                  : data.detection_category === '파'
+                                  ? paImg
+                                  : carrot
+                              }
+                              cropLocation={data.detection_location.address_name}
+                              cropName={data.detection_category}
+                              isCropPest={
+                                data.detection_result.name.includes('정상')
+                                  ? '정상'
+                                  : '병해충 탐지됨'
+                              }
+                            />
+                          );
+                        }
+                      })}
+                    </SwiperView>
+                  );
+                })
+            ) : (
+              <NoBookMarkView>
+                <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
+                <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
+              </NoBookMarkView>
+            )}
+          </Swiper>
+          <AllBookMarkButton onPress={goToBookMark}>
+            <AllBookMarkText>모든 북마크 보러가기</AllBookMarkText>
+            <AntDesign name="right" size={18} color="rgba(0,0,0,0.5)" />
+          </AllBookMarkButton>
+          <VSeparator />
+          <VSeparator />
+          <Title>최근 탐지 기록</Title>
+          {detectData.length !== 0 ? (
+            <SlideView
+              horizontal
+              data={detectData}
+              renderItem={({ item }) => (
+                <CurrentDetectButton
+                  onPress={() => {
+                    goToDetectResult(item._id);
+                  }}
+                  cropPest={item.model_result.name}
+                  cropLocation={item.location.address_name}
+                  cropDate={item.created_at.slice(0, item.created_at.indexOf('일') + 1)}
+                />
+              )}
+              keyExtractor={(_, index) => index.toString()}
+              showsHorizontalScrollIndicator={false}
+              ItemSeparatorComponent={WidthSeparator}
+            />
+          ) : (
+            <NoCurrentDetectView>
+              <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
+              <NoCurrentDetectText>탐지된 기록이 없습니다.</NoCurrentDetectText>
+            </NoCurrentDetectView>
+          )}
+        </Container>
         <VSeparator />
-        <MainBannerBtn>
-          <MainBannerText>SE. SCO를 처음 이용하시나요?</MainBannerText>
-          <MainBannerText2>이용 방법</MainBannerText2>
-          <Ionicons name="chevron-forward" color="#98A1BD" size={24} />
-        </MainBannerBtn>
         <VSeparator />
-        <DetectPestBtn onPress={goToDetectPest}>
-          <DetectPestInnerBorder>
-            <DetectPestText>병해충 탐지하기</DetectPestText>
-          </DetectPestInnerBorder>
-        </DetectPestBtn>
-        <VSeparator />
-        <NormalBtnWrapper>
-          <NormalBtn>
-            <Ionicons name="home-outline" color="#48a346" size={24} />
-            <NormalBtnText>내 농작물</NormalBtnText>
-          </NormalBtn>
-          <NormalBtn onPress={goToMap}>
-            <Ionicons name="map-outline" color="#48a346" size={24} />
-            <NormalBtnText>지도</NormalBtnText>
-          </NormalBtn>
-        </NormalBtnWrapper>
-        <VSeparator />
-        <Title>즐겨찾는 나의 작물</Title>
-        <VSeparator />
-        <Title>최근 탐지 기록</Title>
-      </Container>
-    </Background>
+      </Background>
+    </>
   );
 };
 

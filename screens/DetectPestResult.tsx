@@ -56,6 +56,11 @@ const PestModeText = styled.Text<{ isActivate: boolean }>`
   color: ${(props) => (props.isActivate ? '#000' : 'rgba(0,0,0,0.5)')};
   margin-bottom: 10px;
 `;
+const VisualText = styled.Text`
+  font-size: 20px;
+  font-weight: 600;
+  margin: 15px 10px 5px;
+`;
 const ScrollViewContainer = styled.ScrollView<{ display: boolean; isResult: boolean }>`
   display: ${(props) => (props.display ? 'flex' : 'none')};
   width: 95%;
@@ -131,7 +136,7 @@ const DetectPestResult = ({
       response: {
         result: {
           created_at,
-          detection_oid: visualNumber,
+          detection_oid,
           location: userLocation,
           model_result: { name: pestResult, unidentified },
           user_name: userName,
@@ -204,7 +209,7 @@ const DetectPestResult = ({
     setIsReady(false);
 
     const response = await fetch(
-      `${BASE_URI}/api/v1/detection/visualize/${visualNumber}`,
+      `${BASE_URI}/api/v1/detection/visualize/${detection_oid}`,
       {
         method: 'POST',
         body: JSON.stringify({
@@ -235,17 +240,38 @@ const DetectPestResult = ({
     }
   };
 
-  const initBookMark = () => {
+  const initBookMark = async () => {
     const tempChatsArr = [...chatsArr];
     if (isBookMark) {
+      await fetch(`${BASE_URI}/api/v1/bookmarks/${detection_oid}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }).then((res) => console.log(res.json()));
+
       tempChatsArr.push({ type: 'human', text: '북마크 해제해주세요!' });
       tempChatsArr.push({ type: 'bot', text: '북마크 해제하였습니다.' });
       setChatsArr([...tempChatsArr]);
       setIsBookMark(false);
       return;
     }
+
+    const response = await fetch(`${BASE_URI}/api/v1/bookmarks/${detection_oid}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
     tempChatsArr.push({ type: 'human', text: '북마크 등록해주세요!' });
-    tempChatsArr.push({ type: 'bot', text: '북마크 등록하였습니다.' });
+
+    if (response.msg === 'created') {
+      tempChatsArr.push({ type: 'bot', text: '북마크 등록하였습니다.' });
+    } else {
+      tempChatsArr.push({ type: 'bot', text: '이미 북마크가 등록되었습니다.' });
+    }
+
     setChatsArr([...tempChatsArr]);
     setIsBookMark(true);
   };
@@ -317,11 +343,31 @@ const DetectPestResult = ({
   const repeatResult = () => {
     const tempChatsArr = [...chatsArr];
     tempChatsArr.push({ type: 'human', text: '결과 내용 다시 보여주세요!' });
-    tempChatsArr.push({
-      type: 'bot',
-      text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
-      point: pestResult,
-    });
+    if (pestResult.includes('정상')) {
+      tempChatsArr.push({
+        type: 'bot',
+        text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 탐지된 병해충이 없습니다.`,
+      });
+
+      if (unidentified) {
+        tempChatsArr.push({
+          type: 'bot',
+          text: '이 작물은 SE. SCO AI가 판단하기 어려운 병해충인 것 같아요! 전문가의 도움을 요청해보세요.',
+        });
+      }
+    } else {
+      tempChatsArr.push({
+        type: 'bot',
+        text: `${userName}님, ${created_at}에 ${userLocation}에 있는 작물에서는 ${pestResult}이 탐지 되었습니다.`,
+        point: pestResult,
+      });
+      if (unidentified) {
+        tempChatsArr.push({
+          type: 'bot',
+          text: '이 작물은 SE. SCO AI가 모르는 병해충인 것 같아요! 전문가의 도움을 요청해보세요.',
+        });
+      }
+    }
     setChatsArr([...tempChatsArr]);
   };
 
@@ -397,6 +443,7 @@ const DetectPestResult = ({
         >
           {hasVisual ? (
             <>
+              <VisualText>병해충 정확도</VisualText>
               <BarChart
                 data={graphData}
                 width={PHONE_WIDTH}
@@ -414,6 +461,7 @@ const DetectPestResult = ({
                 showBarTops={true}
                 showValuesOnTopOfBars={true}
               />
+              <VisualText>근처 병해충 정보</VisualText>
               <MapView
                 style={{ height: PHONE_WIDTH }}
                 userInterfaceStyle="light"
