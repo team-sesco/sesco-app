@@ -6,6 +6,8 @@ import HeadSeparator from '../components/HeadSeparator';
 import MainTitle from '../components/MainTitle';
 import { BASE_URI } from '../api/api';
 import { AntDesign } from '@expo/vector-icons';
+import { Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const Container = styled.View`
   width: 95%;
@@ -28,12 +30,18 @@ const NoBookMarkText = styled.Text`
   color: rgba(0, 0, 0, 0.5);
 `;
 
-const BookMark = ({ jwtToken }) => {
-  const [bookMarkData, setBookMarkData] = useState(null);
+const BookMark = ({
+  route: {
+    params: { jwtToken },
+  },
+}) => {
+  const navigation = useNavigation();
+  const [isReady, setIsReady] = useState(true);
+  const [bookMarkData, setBookMarkData] = useState([]);
 
   useEffect(() => {
     getAllBookMark();
-  }, []);
+  }, [jwtToken]);
 
   const getAllBookMark = async () => {
     const response = await fetch(`${BASE_URI}/api/v1/bookmarks`, {
@@ -42,9 +50,31 @@ const BookMark = ({ jwtToken }) => {
         Authorization: `Bearer ${jwtToken}`,
       },
     }).then((res) => res.json());
+
     if (response.msg === 'success') {
       setBookMarkData(response.result);
     }
+  };
+
+  const goToDetectResult = async (detectionId) => {
+    setIsReady(false);
+    const response = await fetch(`${BASE_URI}/api/v1/detection/${detectionId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      navigation.navigate('AlreadyDetectPestResult', {
+        response,
+      });
+
+      setIsReady(true);
+      return;
+    }
+    setIsReady(true);
+    Alert.alert('잠시 후 다시 시도해주세요!');
   };
 
   return (
@@ -52,25 +82,29 @@ const BookMark = ({ jwtToken }) => {
       <HeadSeparator />
       <Container>
         <MainTitle text="모든 북마크" />
-        <Wrapper isBookMark={!!bookMarkData}>
-          {bookMarkData
-            ? bookMarkData.map((data, index) => {
+        <Wrapper isBookMark={bookMarkData.length !== 0}>
+          {bookMarkData.length !== 0 ? (
+            bookMarkData.map((data, index) => {
+              return (
                 <BookMarkButton
                   key={index}
+                  onPress={() => goToDetectResult(data.detection_id)}
                   cropImage={carrot}
                   cropLocation={data.detection_location.address_name}
                   cropName={data.detection_category}
                   isCropPest={
                     data.detection_result.name.includes('정상') ? '정상' : '병해충 탐지됨'
                   }
-                />;
-              })
-            : null}
+                />
+              );
+            })
+          ) : (
+            <NoBookMarkView>
+              <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={40} />
+              <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
+            </NoBookMarkView>
+          )}
         </Wrapper>
-        <NoBookMarkView>
-          <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={40} />
-          <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
-        </NoBookMarkView>
       </Container>
     </>
   );
