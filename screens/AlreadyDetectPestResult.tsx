@@ -4,10 +4,25 @@ import { Dimensions, Platform } from 'react-native';
 import ChatLeftBox from '../components/ChatLeftBox';
 import ChatRightBox from '../components/ChatRightBox';
 import { BarChart } from 'react-native-chart-kit';
+import carrotGIF from '../assets/carrot.gif';
 import { BASE_URI } from '../api/api';
 import MapView, { Callout, Marker } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const LoadingBackground = styled.View<{ isLoading: boolean }>`
+  position: absolute;
+  z-index: 10;
+  display: ${(props) => (props.isLoading ? 'flex' : 'none')};
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+`;
+const LoadingGIF = styled.Image`
+  width: 120px;
+  height: 120px;
+`;
 const Background = styled.View`
   width: 100%;
   height: 100%;
@@ -121,25 +136,28 @@ const AlreadyDetectPestResult = ({
       response: {
         result: {
           _id: detection_oid,
+          category: cropName,
           created_at,
           is_bookmarked,
           img: photoUri,
           location: { address_name: userLocation, x: longitude, y: latitude },
-          model_result: { name: pestResult, unidentified, img: visualUri, ratio },
+          model_result: { name: pestResult, unidentified, img: visualUriTemp, ratio },
           user_name: userName,
         },
       },
-      category: cropName,
     },
   },
 }) => {
   const [jwtToken, setJwtToken] = useState('');
+  const [isReady, setIsReady] = useState(true);
   const scrollViewRef = useRef();
   const [isBookMark, setIsBookMark] = useState(is_bookmarked);
   const [isFontSize, setIsFontSize] = useState(false);
   const { width: PHONE_WIDTH } = Dimensions.get('window');
   const [isResult, setIsResult] = useState(true);
+  const [hasVisual, setHasVisual] = useState(false);
   const [isVisual, setIsVisual] = useState(false);
+  const [visualUri, setVisualUri] = useState(visualUriTemp);
   const [chatsArr, setChatsArr] = useState([{}]);
   const [preparation, setPreparation] = useState('');
   const [symptom, setSymptom] = useState('');
@@ -151,6 +169,7 @@ const AlreadyDetectPestResult = ({
       },
     ],
   };
+
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
       setJwtToken(result);
@@ -190,6 +209,36 @@ const AlreadyDetectPestResult = ({
     setChatsArr([...tempChatsArr]);
   }, []);
 
+  const getVisual = async () => {
+    if (visualUri !== null) {
+      setHasVisual(true);
+      return;
+    }
+    setIsReady(false);
+
+    const response = await fetch(
+      `${BASE_URI}/api/v1/detection/visualize/${detection_oid}`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          img: photoUri,
+          category: cropName,
+          disease: pestResult,
+        }),
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    ).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      setVisualUri(response.result.visualization);
+      setHasVisual(true);
+      setIsReady(true);
+    }
+  };
+
   const initBookMark = async () => {
     const tempChatsArr = [...chatsArr];
     if (isBookMark) {
@@ -213,7 +262,6 @@ const AlreadyDetectPestResult = ({
         Authorization: `Bearer ${jwtToken}`,
       },
     }).then((res) => res.json());
-    console.log(response);
 
     tempChatsArr.push({ type: 'human', text: '북마크 등록해주세요!' });
 
@@ -331,154 +379,169 @@ const AlreadyDetectPestResult = ({
   };
 
   return (
-    <Background>
-      {isResult ? (
-        <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
-      ) : (
-        <PestPhoto source={{ uri: visualUri }} phoneWidth={PHONE_WIDTH} />
-      )}
-      <ContentContainer>
-        <PestMode>
-          <PestResult
-            onPress={() => {
-              setIsResult(true);
-              setIsVisual(false);
-            }}
-          >
-            <PestModeText isActivate={isResult}>결 과</PestModeText>
-          </PestResult>
-          <PestVisual
-            onPress={() => {
-              setIsResult(false);
-              setIsVisual(true);
-            }}
-          >
-            <PestModeText isActivate={isVisual}>시각 자료</PestModeText>
-          </PestVisual>
-        </PestMode>
-      </ContentContainer>
-      <ScrollViewContainer
-        display={isResult}
-        isResult={isResult}
-        showsVerticalScrollIndicator={false}
-        ref={scrollViewRef}
-        onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}
-      >
-        {chatsArr.map(({ type, text, point = false }, index) => {
-          if (type === 'bot') {
-            return (
-              <ChatLeftBox
-                key={index}
-                content={text}
-                isFontSize={isFontSize}
-                point={point}
-              />
-            );
+    <>
+      <LoadingBackground isLoading={!isReady}>
+        <LoadingGIF source={carrotGIF} />
+      </LoadingBackground>
+      <Background>
+        {isResult ? (
+          <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
+        ) : isReady ? (
+          <PestPhoto source={{ uri: visualUri }} phoneWidth={PHONE_WIDTH} />
+        ) : (
+          <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
+        )}
+        <ContentContainer>
+          <PestMode>
+            <PestResult
+              onPress={() => {
+                setIsResult(true);
+                setIsVisual(false);
+              }}
+            >
+              <PestModeText isActivate={isResult}>결 과</PestModeText>
+            </PestResult>
+            <PestVisual
+              onPress={() => {
+                setIsResult(false);
+                getVisual();
+                setIsVisual(true);
+              }}
+            >
+              <PestModeText isActivate={isVisual}>시각 자료</PestModeText>
+            </PestVisual>
+          </PestMode>
+        </ContentContainer>
+        <ScrollViewContainer
+          display={isResult}
+          isResult={isResult}
+          showsVerticalScrollIndicator={false}
+          ref={scrollViewRef}
+          onContentSizeChange={() =>
+            scrollViewRef.current.scrollToEnd({ animated: true })
           }
-          return <ChatRightBox key={index} content={text} isFontSize={isFontSize} />;
-        })}
-      </ScrollViewContainer>
-      <ScrollViewContainer
-        display={isVisual}
-        isResult={isResult}
-        showsVerticalScrollIndicator={false}
-      >
-        <VisualText>병해충 정확도</VisualText>
-        <BarChart
-          data={graphData}
-          width={PHONE_WIDTH}
-          height={220}
-          chartConfig={{
-            backgroundGradientFrom: '#FFF',
-            backgroundGradientTo: '#FFF',
-            color: (opacity = 1) => `rgba(32, 53, 32, ${opacity})`,
-            strokeWidth: 2,
-            useShadowColorFromDataset: false,
-          }}
-          fromZero={true}
-          withInnerLines={false}
-          yAxisSuffix={'%'}
-          showBarTops={true}
-          showValuesOnTopOfBars={true}
-        />
-        <VisualText>근처 병해충 정보</VisualText>
-        <MapView
-          style={{ height: PHONE_WIDTH }}
-          userInterfaceStyle="light"
-          // followsUserLocation={true}
-          showsUserLocation={true}
-          rotateEnabled={false}
-          pitchEnabled={false}
-          initialRegion={{
-            latitude: latitude,
-            longitude: longitude,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-          }}
         >
-          <Marker
-            coordinate={{ latitude: 37.5873767, longitude: 127.097316501 }}
-            image={require('../assets/location5.png')}
-          >
-            <Callout tooltip>
-              <LocationContainer>
-                <LocationBubble>
-                  <LocationText>콩 점무늬병</LocationText>
-                  <LocationImage source={require('../assets/cong.jpg')} />
-                </LocationBubble>
-                <ArrowBorder></ArrowBorder>
-                <Arrow></Arrow>
-              </LocationContainer>
-            </Callout>
-          </Marker>
+          {chatsArr.map(({ type, text, point = false }, index) => {
+            if (type === 'bot') {
+              return (
+                <ChatLeftBox
+                  key={index}
+                  content={text}
+                  isFontSize={isFontSize}
+                  point={point}
+                />
+              );
+            }
+            return <ChatRightBox key={index} content={text} isFontSize={isFontSize} />;
+          })}
+        </ScrollViewContainer>
+        <ScrollViewContainer
+          display={isVisual}
+          isResult={isResult}
+          showsVerticalScrollIndicator={false}
+        >
+          {hasVisual ? (
+            <>
+              <VisualText>병해충 정확도</VisualText>
+              <BarChart
+                data={graphData}
+                width={PHONE_WIDTH}
+                height={220}
+                chartConfig={{
+                  backgroundGradientFrom: '#FFF',
+                  backgroundGradientTo: '#FFF',
+                  color: (opacity = 1) => `rgba(32, 53, 32, ${opacity})`,
+                  strokeWidth: 2,
+                  useShadowColorFromDataset: false,
+                }}
+                fromZero={true}
+                withInnerLines={false}
+                yAxisSuffix={'%'}
+                showBarTops={true}
+                showValuesOnTopOfBars={true}
+              />
+              <VisualText>근처 병해충 정보</VisualText>
+              <MapView
+                style={{ height: PHONE_WIDTH }}
+                userInterfaceStyle="light"
+                // followsUserLocation={true}
+                showsUserLocation={true}
+                rotateEnabled={false}
+                pitchEnabled={false}
+                initialRegion={{
+                  latitude: latitude,
+                  longitude: longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                }}
+              >
+                <Marker
+                  onPress={() => console.log('ㄴ누ㄹ렀음')}
+                  coordinate={{ latitude: 37.5873767, longitude: 127.097316501 }}
+                  image={require('../assets/location5.png')}
+                >
+                  <Callout tooltip>
+                    <LocationContainer>
+                      <LocationBubble>
+                        <LocationText>콩 점무늬병</LocationText>
+                        <LocationImage source={require('../assets/cong.jpg')} />
+                      </LocationBubble>
+                      <ArrowBorder></ArrowBorder>
+                      <Arrow></Arrow>
+                    </LocationContainer>
+                  </Callout>
+                </Marker>
 
-          <Marker
-            coordinate={{ latitude: latitude, longitude: longitude }}
-            image={require('../assets/location5.png')}
+                <Marker
+                  coordinate={{ latitude: latitude, longitude: longitude }}
+                  image={require('../assets/location5.png')}
+                >
+                  <Callout tooltip>
+                    <LocationContainer>
+                      <LocationBubble>
+                        <LocationText>콩 점무늬병</LocationText>
+                        <LocationImage source={require('../assets/cong.jpg')} />
+                      </LocationBubble>
+                      <ArrowBorder></ArrowBorder>
+                      <Arrow></Arrow>
+                    </LocationContainer>
+                  </Callout>
+                </Marker>
+              </MapView>
+            </>
+          ) : null}
+        </ScrollViewContainer>
+        <SeparationLine isIOS={Platform.OS === 'ios'} isActivate={isResult} />
+        <AskButtonBox
+          horizontal={true}
+          showHorizontalScrollIndicator={false}
+          isIOS={Platform.OS === 'ios'}
+          isActivate={isResult}
+        >
+          <AskButton onPress={initBookMark}>
+            <AskButtonText>{isBookMark ? '북마크 해제' : '북마크 등록'}</AskButtonText>
+          </AskButton>
+          <AskButton
+            notSupport={pestResult.includes('정상') || cropName === '기타'}
+            onPress={getSymptom}
           >
-            <Callout tooltip>
-              <LocationContainer>
-                <LocationBubble>
-                  <LocationText>콩 점무늬병</LocationText>
-                  <LocationImage source={require('../assets/cong.jpg')} />
-                </LocationBubble>
-                <ArrowBorder></ArrowBorder>
-                <Arrow></Arrow>
-              </LocationContainer>
-            </Callout>
-          </Marker>
-        </MapView>
-      </ScrollViewContainer>
-      <SeparationLine isIOS={Platform.OS === 'ios'} isActivate={isResult} />
-      <AskButtonBox
-        horizontal={true}
-        showHorizontalScrollIndicator={false}
-        isIOS={Platform.OS === 'ios'}
-        isActivate={isResult}
-      >
-        <AskButton onPress={initBookMark}>
-          <AskButtonText>{isBookMark ? '북마크 해제' : '북마크 등록'}</AskButtonText>
-        </AskButton>
-        <AskButton
-          notSupport={pestResult.includes('정상') || cropName === '기타'}
-          onPress={getSymptom}
-        >
-          <AskButtonText>증상</AskButtonText>
-        </AskButton>
-        <AskButton
-          notSupport={pestResult.includes('정상') || cropName === '기타'}
-          onPress={getPreparation}
-        >
-          <AskButtonText>대처 방안</AskButtonText>
-        </AskButton>
-        <AskButton onPress={repeatResult}>
-          <AskButtonText>결과 다시보기</AskButtonText>
-        </AskButton>
-        <AskButton onPress={initFontSize}>
-          <AskButtonText>{isFontSize ? '글자 줄여줘' : '글자 키워줘'}</AskButtonText>
-        </AskButton>
-      </AskButtonBox>
-    </Background>
+            <AskButtonText>증상</AskButtonText>
+          </AskButton>
+          <AskButton
+            notSupport={pestResult.includes('정상') || cropName === '기타'}
+            onPress={getPreparation}
+          >
+            <AskButtonText>대처 방안</AskButtonText>
+          </AskButton>
+          <AskButton onPress={repeatResult}>
+            <AskButtonText>결과 다시보기</AskButtonText>
+          </AskButton>
+          <AskButton onPress={initFontSize}>
+            <AskButtonText>{isFontSize ? '글자 줄여줘' : '글자 키워줘'}</AskButtonText>
+          </AskButton>
+        </AskButtonBox>
+      </Background>
+    </>
   );
 };
 
