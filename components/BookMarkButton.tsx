@@ -39,14 +39,14 @@ const ArrowBox = styled.View`
   right: 20px;
 `;
 
-const BookMarkButton = ({ onPress, cropImage, cropLocation, cropName, isCropPest }) => {
+const BookMarkButton = ({ onPress, cropImage, cropLocation, cropName, cropPest }) => {
   return (
     <Container onPress={onPress}>
       <CropImage source={cropImage} />
       <CropTextWrapper>
         <CropLocation>{cropLocation}</CropLocation>
         <CropName>{cropName}</CropName>
-        <CropPest>{isCropPest ? '병해충 탐지됨' : '정상'}</CropPest>
+        <CropPest>{cropPest}</CropPest>
       </CropTextWrapper>
       <ArrowBox>
         <AntDesign name="right" size={24} color="rgba(0,0,0,0.2)" />

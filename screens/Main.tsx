@@ -374,7 +374,7 @@ const Main = () => {
                               }
                               cropLocation={data.detection_location.address_name}
                               cropName={data.detection_category}
-                              isCropPest={
+                              cropPest={
                                 data.detection_result.name.includes('정상')
                                   ? '정상'
                                   : '병해충 탐지됨'
