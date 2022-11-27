@@ -13,8 +13,8 @@ const Container = styled.TouchableOpacity`
   border: 1px solid rgba(9, 9, 9, 0.1);
 `;
 const CropImage = styled.Image`
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   margin: 0 8%;
 `;
 const CropTextWrapper = styled.View`

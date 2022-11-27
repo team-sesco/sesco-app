@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import BookMarkButton from '../components/BookMarkButton';
 import carrot from '../assets/carrot.gif';
+import gochuImg from '../assets/gochu.png';
+import muImg from '../assets/mu.png';
+import baechuImg from '../assets/baechu.png';
+import kongImg from '../assets/kong.png';
+import paImg from '../assets/pa.png';
 import HeadSeparator from '../components/HeadSeparator';
 import MainTitle from '../components/MainTitle';
 import { BASE_URI } from '../api/api';
@@ -13,6 +18,7 @@ const Container = styled.View`
   width: 95%;
   height: 100%;
   margin: 0 auto;
+  margin-top: 10px;
 `;
 
 const Wrapper = styled.ScrollView<{ isBookMark: boolean }>`
@@ -89,7 +95,19 @@ const BookMark = ({
                 <BookMarkButton
                   key={index}
                   onPress={() => goToDetectResult(data.detection_id)}
-                  cropImage={carrot}
+                  cropImage={
+                    data.detection_category === '고추'
+                      ? gochuImg
+                      : data.detection_category === '무'
+                      ? muImg
+                      : data.detection_category === '배추'
+                      ? baechuImg
+                      : data.detection_category === '콩'
+                      ? kongImg
+                      : data.detection_category === '파'
+                      ? paImg
+                      : carrot
+                  }
                   cropLocation={data.detection_location.address_name}
                   cropName={data.detection_category}
                   isCropPest={

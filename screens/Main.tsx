@@ -5,6 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import HeadSeparator from '../components/HeadSeparator';
 import BookMarkButton from '../components/BookMarkButton';
 import carrot from '../assets/carrot.gif';
+import gochuImg from '../assets/gochu.png';
+import muImg from '../assets/mu.png';
+import baechuImg from '../assets/baechu.png';
+import kongImg from '../assets/kong.png';
+import paImg from '../assets/pa.png';
 import Swiper from 'react-native-swiper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
@@ -349,7 +354,19 @@ const Main = () => {
                                 goToDetectResult(data.detection_id);
                               }}
                               key={semiIndex}
-                              cropImage={carrot}
+                              cropImage={
+                                data.detection_category === '고추'
+                                  ? gochuImg
+                                  : data.detection_category === '무'
+                                  ? muImg
+                                  : data.detection_category === '배추'
+                                  ? baechuImg
+                                  : data.detection_category === '콩'
+                                  ? kongImg
+                                  : data.detection_category === '파'
+                                  ? paImg
+                                  : carrot
+                              }
                               cropLocation={data.detection_location.address_name}
                               cropName={data.detection_category}
                               isCropPest={
