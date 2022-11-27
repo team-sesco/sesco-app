@@ -13,6 +13,7 @@ import { BASE_URI } from '../api/api';
 import { AntDesign } from '@expo/vector-icons';
 import { Alert } from 'react-native';
 import BookMarkButton from '../components/BookMarkButton';
+import Swiper from 'react-native-swiper';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -33,6 +34,51 @@ const Container = styled.View`
   width: 95%;
   height: 100%;
   margin: 10px auto;
+`;
+
+const SwiperView = styled.View`
+  height: 180px;
+  margin: 10px 0 -20px;
+`;
+
+const SwiperButton = styled.TouchableOpacity`
+  padding: 10px;
+  background-color: #fff;
+  border: 2px solid #3b966050;
+  border-radius: 15px;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 5px;
+`;
+
+const TopThreeTextWrapper = styled.View``;
+const TopThreeImage = styled.Image`
+  width: 100px;
+  height: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  margin-right: 20px;
+`;
+
+const TopThreeLocation = styled.Text`
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+`;
+const TopThreeCategory = styled.Text`
+  margin-top: 3px;
+  font-size: 16px;
+  font-weight: 600;
+`;
+const TopThreePest = styled.Text`
+  margin-top: 3px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #3b9660;
+`;
+const TopThreeDate = styled.Text`
+  margin-top: 3px;
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.5);
 `;
 
 const ListView = styled.FlatList`
@@ -57,11 +103,28 @@ const MyDetection = ({
 }) => {
   const navigation = useNavigation();
   const [isReady, setIsReady] = useState(true);
+  const [topDetectionData, setTopDetectionData] = useState([]);
   const [detectionData, setDetectionData] = useState([]);
 
   useEffect(() => {
+    getTopThreeDetection();
     getAllDetection();
   }, [jwtToken]);
+
+  const getTopThreeDetection = async () => {
+    await fetch(`${BASE_URI}/api/v1/detection?limit=3`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response.msg === 'success') {
+          setTopDetectionData(response.result);
+        }
+      });
+  };
 
   const getAllDetection = async () => {
     const response = await fetch(`${BASE_URI}/api/v1/detection`, {
@@ -72,7 +135,11 @@ const MyDetection = ({
     }).then((res) => res.json());
 
     if (response.msg === 'success') {
-      setDetectionData(response.result);
+      const tempResult = response.result;
+      for (let count = 0; count < 3; count += 1) {
+        tempResult.shift();
+      }
+      setDetectionData(tempResult);
     }
   };
 
@@ -105,6 +172,35 @@ const MyDetection = ({
       <HeadSeparator />
       <Container>
         <MainTitle text="탐지 목록" />
+        {topDetectionData.length !== 0 ? (
+          <SwiperView>
+            <Swiper activeDotColor="#3b9660">
+              {topDetectionData.map((data, index) => {
+                return (
+                  <SwiperButton key={index} onPress={() => goToDetectResult(data._id)}>
+                    <TopThreeImage source={{ uri: data.img }} />
+                    <TopThreeTextWrapper>
+                      <TopThreeLocation>{data.location.address_name}</TopThreeLocation>
+                      <TopThreeCategory>{data.category}</TopThreeCategory>
+                      <TopThreePest>
+                        {`${
+                          data.model_result.name.includes('정상')
+                            ? '정상'
+                            : data.model_result.name
+                        } (${(
+                          data.model_result.ratio.value[
+                            data.model_result.ratio.name.indexOf(data.model_result.name)
+                          ] * 100
+                        ).toFixed(2)}%)`}
+                      </TopThreePest>
+                      <TopThreeDate>{data.created_at}</TopThreeDate>
+                    </TopThreeTextWrapper>
+                  </SwiperButton>
+                );
+              })}
+            </Swiper>
+          </SwiperView>
+        ) : null}
         {detectionData.length !== 0 ? (
           <ListView
             data={detectionData}
@@ -138,7 +234,7 @@ const MyDetection = ({
             keyExtractor={(_, index) => index.toString()}
             showsVerticalScrollIndicator={false}
           />
-        ) : (
+        ) : topDetectionData.length !== 0 ? null : (
           <NoCurrentDetectView>
             <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
             <NoCurrentDetectText>탐지된 기록이 없습니다.</NoCurrentDetectText>
