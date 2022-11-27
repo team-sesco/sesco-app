@@ -258,9 +258,8 @@ const DetectPestResult = ({
     }
 
     const response = await fetch(`${BASE_URI}/api/v1/bookmarks/${detection_oid}`, {
-      method: 'get',
+      method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${jwtToken}`,
       },
     }).then((res) => res.json());
