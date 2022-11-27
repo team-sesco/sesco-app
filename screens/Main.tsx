@@ -255,6 +255,7 @@ const Main = () => {
       navigation.navigate('AlreadyDetectPestResult', {
         response,
       });
+
       setIsReady(true);
       return;
     }
@@ -319,7 +320,16 @@ const Main = () => {
           <Title>즐겨찾는 나의 작물</Title>
           <Swiper
             activeDotColor="#3b9660"
-            style={{ height: bookMarkData.length !== 0 ? 350 : 150 }}
+            style={{
+              height:
+                bookMarkData.length === 0
+                  ? 150
+                  : bookMarkData.length === 1
+                  ? 150
+                  : bookMarkData.length === 2
+                  ? 250
+                  : 350,
+            }}
           >
             {bookMarkData.length !== 0 ? (
               bookMarkData
