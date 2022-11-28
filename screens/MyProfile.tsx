@@ -99,6 +99,7 @@ const MyProfile = () => {
   const [jwtToken, setJwtToken] = useState('');
   const [userName, setUserName] = useState('NICKNAME');
   const [userImg, setUserImg] = useState('null');
+  const [createDate, setCreateDate] = useState('');
   const [isReady, setIsReady] = useState(true);
   const isFocused = useIsFocused();
   const [libraryStatus, libraryRequestPermission] =
@@ -128,12 +129,18 @@ const MyProfile = () => {
     if (response.msg === 'success') {
       setUserName(response.result.name);
       setUserImg(response.result.img);
+      setCreateDate(response.result.created_at.slice(0, 10));
     }
   };
 
   const goToChangeName = () => {
     //@ts-ignore
     navigation.navigate('ChangeName');
+  };
+
+  const goToDeleteUser = () => {
+    //@ts-ignore
+    navigation.navigate('DeleteUser', { jwtToken, createDate, userName });
   };
 
   const goBack = () => {
@@ -252,7 +259,7 @@ const MyProfile = () => {
             <ContentSubject>닉네임 변경</ContentSubject>
             <Ionicons name="chevron-forward" color="rgba(0,0,0,0.7)" size={24} />
           </ContentWrapperButton>
-          <ContentWrapperButton>
+          <ContentWrapperButton onPress={goToDeleteUser}>
             <ContentSubject>회원탈퇴</ContentSubject>
             <Ionicons name="chevron-forward" color="rgba(0,0,0,0.7)" size={24} />
           </ContentWrapperButton>
