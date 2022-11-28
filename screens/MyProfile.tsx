@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 import HeadSeparator from '../components/HeadSeparator';
 import MainTitle from '../components/MainTitle';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
 import carrotGIF from '../assets/carrot.gif';
@@ -100,6 +100,7 @@ const MyProfile = () => {
   const [userName, setUserName] = useState('NICKNAME');
   const [userImg, setUserImg] = useState('null');
   const [isReady, setIsReady] = useState(true);
+  const isFocused = useIsFocused();
   const [libraryStatus, libraryRequestPermission] =
     ImagePicker.useMediaLibraryPermissions();
 
@@ -108,7 +109,8 @@ const MyProfile = () => {
       setJwtToken(result);
       getUserInfo(result);
     });
-  }, []);
+  }, [isFocused]);
+
   useEffect(() => {
     if (jwtToken) {
       getUserInfo(jwtToken);
