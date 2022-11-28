@@ -24,6 +24,7 @@ const Root = ({ jwtToken }) => {
     >
       {!jwtToken ? <Nav.Screen name="Login" component={Login} /> : null}
       <Nav.Screen name="Drawer" component={Drawer} />
+      <Nav.Screen name="Search" component={Search} />
       <Nav.Screen name="Map" component={Map} />
       <Nav.Screen name="Stack" component={Stack} />
       <Nav.Screen name="MyDetection" component={MyDetection} />
@@ -31,6 +32,7 @@ const Root = ({ jwtToken }) => {
       <Nav.Screen name="AlreadyDetectPestResult" component={AlreadyDetectPestResult} />
       <Nav.Screen name="BookMark" component={BookMark} />
       <Nav.Screen name="ChangeName" component={ChangeName} />
+      <Nav.Screen name="DeleteUser" component={DeleteUser} />
       <Nav.Screen name="SameLogin" component={Login} />
     </Nav.Navigator>
   );

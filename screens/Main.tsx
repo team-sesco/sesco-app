@@ -210,6 +210,11 @@ const Main = () => {
     navigation.reset({ routes: [{ name: 'Map' }] });
   };
 
+  const goToSearch = () => {
+    //@ts-ignore
+    navigation.navigate('Search', { jwtToken });
+  };
+
   const goToDetectPest = () => {
     //@ts-ignore
     navigation.navigate('Stack', {
@@ -290,7 +295,7 @@ const Main = () => {
             </HeaderButton>
           </LeftHeader>
           <RightHeader>
-            <HeaderButton>
+            <HeaderButton onPress={goToSearch}>
               <AntDesign
                 name="search1"
                 color="#98A1BD"
