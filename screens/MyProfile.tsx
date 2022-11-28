@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import HeadSeparator from '../components/HeadSeparator';
 import MainTitle from '../components/MainTitle';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BASE_URI } from '../api/api';
 
 const Background = styled.View`
   width: 100%;
@@ -18,7 +20,6 @@ const BackBotton = styled.TouchableOpacity`
 const Container = styled.View<{ statusbarHeight: number }>`
   width: 90%;
   margin: 0 auto;
-  /* margin-bottom: ${(props) => props.statusbarHeight + 30}px; */
 `;
 
 const TitleSeparator = styled.View`
@@ -76,6 +77,31 @@ const ContentValue = styled.Text`
 
 const MyProfile = () => {
   const navigation = useNavigation();
+  const [jwtToken, setJwtToken] = useState('');
+  const [userName, setUserName] = useState('NICKNAME');
+  const [userImg, setUserImg] = useState('null');
+
+  useEffect(() => {
+    AsyncStorage.getItem('jwtToken', (_, result) => {
+      setJwtToken(result);
+      getUserInfo(result);
+    });
+  }, []);
+
+  const getUserInfo = async (jwtToken) => {
+    const response = await fetch(`${BASE_URI}/api/v1/users/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      setUserName(response.result.name);
+      setUserImg(response.result.img);
+    }
+  };
+
   const goBack = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: 'Main' }] });
@@ -92,12 +118,18 @@ const MyProfile = () => {
           <TitleSeparator />
           <TopView>
             <ProfileImageWrapper>
-              <ProfileImage source={require('../assets/defaultMyImage.png')} />
+              <ProfileImage
+                source={
+                  userImg === null || userImg === 'null'
+                    ? require('../assets/defaultMyImage.png')
+                    : { uri: userImg }
+                }
+              />
               <ProfileImageChangeButton>
                 <MaterialCommunityIcons name="plus-circle" size={24} color="green" />
               </ProfileImageChangeButton>
             </ProfileImageWrapper>
-            <MyNickname>NICKNAME</MyNickname>
+            <MyNickname>{userName}</MyNickname>
           </TopView>
         </Container>
         <SeparateView />
