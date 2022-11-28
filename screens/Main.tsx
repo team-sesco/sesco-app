@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { Octicons, Ionicons, AntDesign, SimpleLineIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import HeadSeparator from '../components/HeadSeparator';
 import BookMarkButton from '../components/BookMarkButton';
 import carrot from '../assets/carrot.gif';
@@ -184,17 +184,15 @@ const Main = () => {
   const [isReady, setIsReady] = useState(true);
   const [bookMarkData, setBookMarkData] = useState([]);
   const [detectData, setDetectData] = useState([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
       setJwtToken(result);
+      getBookMark(result);
+      getDetectCrop(result);
     });
-  }, []);
-
-  useEffect(() => {
-    getBookMark();
-    getDetectCrop();
-  }, [jwtToken]);
+  }, [isFocused]);
 
   const openLink = async () => {
     await WebBrowser.openBrowserAsync(
@@ -224,7 +222,7 @@ const Main = () => {
     navigation.navigate('BookMark', { jwtToken });
   };
 
-  const getBookMark = async () => {
+  const getBookMark = async (jwtToken) => {
     const response = await fetch(`${BASE_URI}/api/v1/bookmarks?limit=15`, {
       method: 'GET',
       headers: {
@@ -237,7 +235,7 @@ const Main = () => {
     }
   };
 
-  const getDetectCrop = async () => {
+  const getDetectCrop = async (jwtToken) => {
     await fetch(`${BASE_URI}/api/v1/detection?limit=10`, {
       method: 'GET',
       headers: {
