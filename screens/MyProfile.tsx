@@ -52,14 +52,14 @@ const ProfileImageWrapper = styled.View`
   margin: 0 auto;
 `;
 const ProfileImage = styled.Image`
-  width: 70px;
-  height: 70px;
-  border-radius: 35px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50px;
 `;
 const ProfileImageChangeButton = styled.TouchableOpacity`
   position: absolute;
-  right: -3px;
-  bottom: -3px;
+  right: -5px;
+  bottom: -5px;
 `;
 const MyNickname = styled.Text`
   margin-top: 20px;
@@ -240,7 +240,7 @@ const MyProfile = () => {
                 }
               />
               <ProfileImageChangeButton onPress={() => changeImage()}>
-                <MaterialCommunityIcons name="plus-circle" size={24} color="green" />
+                <MaterialCommunityIcons name="plus-circle" size={30} color="green" />
               </ProfileImageChangeButton>
             </ProfileImageWrapper>
             <MyNickname>{userName}</MyNickname>

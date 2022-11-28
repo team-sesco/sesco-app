@@ -51,9 +51,9 @@ const ProfileImageWrapper = styled.View`
   margin: 0 auto;
 `;
 const ProfileImage = styled.Image`
-  width: 70px;
-  height: 70px;
-  border-radius: 35px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50px;
 `;
 
 const SeparateView = styled.View`
@@ -180,7 +180,7 @@ const ChangeName = () => {
 
   const changeName = async () => {
     setIsReady(false);
-    console.log(changeUserName);
+
     const changeResponse = await fetch(`${BASE_URI}/api/v1/users/me`, {
       method: 'PUT',
       body: JSON.stringify({
@@ -192,8 +192,7 @@ const ChangeName = () => {
         'Content-Type': 'application/json',
       },
     }).then((res) => res.json());
-    console.log(changeResponse);
-    console.log(changeUserName);
+
     if (changeResponse.msg === 'created') {
       Alert.alert('닉네임이 변경되었습니다!');
       setIsReady(true);
