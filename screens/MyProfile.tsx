@@ -64,7 +64,8 @@ const ProfileImageChangeButton = styled.TouchableOpacity`
 const MyNickname = styled.Text`
   margin-top: 20px;
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: 600;
 `;
 
 const SeparateView = styled.View`
@@ -202,6 +203,8 @@ const MyProfile = () => {
                   'https://sesco-s3.s3.ap-northeast-2.amazonaws.com/profile/white_background.png'
                 );
                 Alert.alert('사진이 변경되었습니다!');
+              } else {
+                Alert.alert('업로드에 실패하였습니다.');
               }
             } else if (response.description.includes('extension')) {
               Alert.alert('호환되지 않은 확장자입니다.', '다른 사진으로 올려주세요.');
