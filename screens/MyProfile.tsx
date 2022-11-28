@@ -6,6 +6,24 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
+import carrotGIF from '../assets/carrot.gif';
+import * as ImagePicker from 'expo-image-picker';
+import { Alert, Platform } from 'react-native';
+
+const LoadingBackground = styled.View<{ isLoading: boolean }>`
+  position: absolute;
+  z-index: 10;
+  display: ${(props) => (props.isLoading ? 'flex' : 'none')};
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+`;
+const LoadingGIF = styled.Image`
+  width: 120px;
+  height: 120px;
+`;
 
 const Background = styled.View`
   width: 100%;
@@ -80,6 +98,9 @@ const MyProfile = () => {
   const [jwtToken, setJwtToken] = useState('');
   const [userName, setUserName] = useState('NICKNAME');
   const [userImg, setUserImg] = useState('null');
+  const [isReady, setIsReady] = useState(true);
+  const [libraryStatus, libraryRequestPermission] =
+    ImagePicker.useMediaLibraryPermissions();
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
@@ -106,8 +127,78 @@ const MyProfile = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: 'Main' }] });
   };
+
+  const changeImage = async () => {
+    await libraryRequestPermission().then(async () => {
+      if (libraryStatus?.status === 'denied') {
+        Alert.alert('사진 허용 오류', '설정에 들어가서 사진 접근을 허용해주세요!');
+      } else {
+        try {
+          const result = await ImagePicker.launchImageLibraryAsync({
+            quality: 1,
+            aspect: [4, 4],
+            allowsEditing: true,
+          });
+
+          if (!result.cancelled) {
+            setIsReady(false);
+            const formData = new FormData();
+            formData.append('photo', {
+              name: result.fileName?.toLowerCase()
+                ? result.fileName?.toLowerCase()
+                : 'new.png',
+              type: result.type,
+              uri:
+                Platform.OS === 'android'
+                  ? result.uri
+                  : result.uri.replace('file://', ''),
+            });
+
+            const response = await fetch(`${BASE_URI}/api/v1/users/me/photo`, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                Authorization: `Bearer ${jwtToken}`,
+                'Content-Type': 'multipart/form-data',
+              },
+            }).then((res) => res.json());
+
+            if (response.msg === 'success') {
+              setUserImg(response.result);
+              const changeResponse = await fetch(`${BASE_URI}/api/v1/users/me`, {
+                method: 'PUT',
+                body: {
+                  img: response.result,
+                  name: userName,
+                },
+                headers: {
+                  Authorization: `Bearer ${jwtToken}`,
+                  'Content-Type': 'application/json',
+                },
+              }).then((res) => res.json());
+
+              if (changeResponse.msg === 'created') {
+                Alert.alert('사진이 변경되었습니다!');
+              }
+            } else if (response.description.includes('extension')) {
+              Alert.alert('호환되지 않은 확장자입니다.', '다른 사진으로 올려주세요.');
+            } else {
+              Alert.alert('업로드에 실패하였습니다.');
+            }
+            setIsReady(true);
+          }
+        } catch {
+          Alert.alert('오류가 발생하였습니다.');
+          setIsReady(true);
+        }
+      }
+    });
+  };
   return (
     <>
+      <LoadingBackground isLoading={!isReady}>
+        <LoadingGIF source={carrotGIF} />
+      </LoadingBackground>
       <HeadSeparator />
       <Background>
         <Container showsVerticalScrollIndicator={false}>
@@ -125,7 +216,7 @@ const MyProfile = () => {
                     : { uri: userImg }
                 }
               />
-              <ProfileImageChangeButton>
+              <ProfileImageChangeButton onPress={() => changeImage()}>
                 <MaterialCommunityIcons name="plus-circle" size={24} color="green" />
               </ProfileImageChangeButton>
             </ProfileImageWrapper>
