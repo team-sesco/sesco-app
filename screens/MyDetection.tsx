@@ -98,7 +98,7 @@ const NoCurrentDetectText = styled.Text`
 
 const MyDetection = ({
   route: {
-    params: { jwtToken },
+    params: { jwtToken, userName },
   },
 }) => {
   const navigation = useNavigation();
@@ -155,6 +155,7 @@ const MyDetection = ({
     if (response.msg === 'success') {
       navigation.navigate('AlreadyDetectPestResult', {
         response,
+        userName,
       });
 
       setIsReady(true);

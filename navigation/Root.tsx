@@ -9,6 +9,9 @@ import ChangeName from '../screens/ChangeName';
 import BookMark from '../screens/BookMark';
 import AlreadyDetectPestResult from '../screens/AlreadyDetectPestResult';
 import MyDetection from '../screens/MyDetection';
+import DeleteUser from '../screens/DeleteUser';
+import Search from '../screens/Search';
+import Report from '../screens/Report';
 
 const Nav = createNativeStackNavigator();
 
@@ -33,6 +36,7 @@ const Root = ({ jwtToken }) => {
       <Nav.Screen name="BookMark" component={BookMark} />
       <Nav.Screen name="ChangeName" component={ChangeName} />
       <Nav.Screen name="DeleteUser" component={DeleteUser} />
+      <Nav.Screen name="Report" component={Report} options={{ presentation: 'modal' }} />
       <Nav.Screen name="SameLogin" component={Login} />
     </Nav.Navigator>
   );

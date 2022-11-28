@@ -204,7 +204,7 @@ const Main = () => {
 
   const goToMyDetection = () => {
     //@ts-ignore
-    navigation.navigate('MyDetection', { jwtToken });
+    navigation.navigate('MyDetection', { jwtToken, userName });
   };
 
   const goToMap = () => {
@@ -286,6 +286,7 @@ const Main = () => {
     if (response.msg === 'success') {
       navigation.navigate('AlreadyDetectPestResult', {
         response,
+        userName,
       });
 
       setIsReady(true);

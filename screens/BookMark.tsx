@@ -90,6 +90,7 @@ const BookMark = ({
     if (response.msg === 'success') {
       navigation.navigate('AlreadyDetectPestResult', {
         response,
+        userName,
       });
 
       setIsReady(true);
