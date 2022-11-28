@@ -34,12 +34,32 @@ const CropPest = styled.Text`
   font-weight: 700;
   color: #3b9660;
 `;
+const MyCropBox = styled.View`
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  background-color: #3b966099;
+  border-radius: 5px;
+`;
+const MyCropText = styled.Text`
+  color: #fff;
+  padding: 1px;
+  font-weight: 600;
+  font-size: 15px;
+`;
 const ArrowBox = styled.View`
   position: absolute;
   right: 20px;
 `;
 
-const BookMarkButton = ({ onPress, cropImage, cropLocation, cropName, cropPest }) => {
+const BookMarkButton = ({
+  onPress,
+  cropImage,
+  cropLocation,
+  cropName,
+  cropPest,
+  isMyCrop = false,
+}) => {
   return (
     <Container onPress={onPress}>
       <CropImage source={cropImage} />
@@ -48,6 +68,11 @@ const BookMarkButton = ({ onPress, cropImage, cropLocation, cropName, cropPest }
         <CropName>{cropName}</CropName>
         <CropPest>{cropPest}</CropPest>
       </CropTextWrapper>
+      {isMyCrop ? (
+        <MyCropBox>
+          <MyCropText>내작물</MyCropText>
+        </MyCropBox>
+      ) : null}
       <ArrowBox>
         <AntDesign name="right" size={24} color="rgba(0,0,0,0.2)" />
       </ArrowBox>

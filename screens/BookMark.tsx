@@ -54,7 +54,7 @@ const NoBookMarkText = styled.Text`
 
 const BookMark = ({
   route: {
-    params: { jwtToken },
+    params: { jwtToken, userName },
   },
 }) => {
   const navigation = useNavigation();
@@ -132,6 +132,7 @@ const BookMark = ({
                   cropPest={
                     data.detection_result.name.includes('정상') ? '정상' : '병해충 탐지됨'
                   }
+                  isMyCrop={userName === data.user_name}
                 />
               );
             })}

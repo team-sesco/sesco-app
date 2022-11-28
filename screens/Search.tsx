@@ -231,6 +231,7 @@ const Search = ({
                         ? '정상'
                         : item.model_result.name
                     }
+                    isMyCrop={item.user_name === userName}
                   />
                 )}
                 keyExtractor={(_, index) => index.toString()}

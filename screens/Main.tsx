@@ -185,12 +185,14 @@ const Main = () => {
   const [bookMarkData, setBookMarkData] = useState([]);
   const [detectData, setDetectData] = useState([]);
   const isFocused = useIsFocused();
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
       setJwtToken(result);
       getBookMark(result);
       getDetectCrop(result);
+      getUserInfo(result);
     });
   }, [isFocused]);
 
@@ -212,7 +214,7 @@ const Main = () => {
 
   const goToSearch = () => {
     //@ts-ignore
-    navigation.navigate('Search', { jwtToken });
+    navigation.navigate('Search', { jwtToken, userName });
   };
 
   const goToDetectPest = () => {
@@ -224,7 +226,20 @@ const Main = () => {
 
   const goToBookMark = () => {
     //@ts-ignore
-    navigation.navigate('BookMark', { jwtToken });
+    navigation.navigate('BookMark', { jwtToken, userName });
+  };
+
+  const getUserInfo = async (jwtToken) => {
+    const response = await fetch(`${BASE_URI}/api/v1/users/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      setUserName(response.result.name);
+    }
   };
 
   const getBookMark = async (jwtToken) => {
@@ -386,6 +401,7 @@ const Main = () => {
                                   ? '정상'
                                   : '병해충 탐지됨'
                               }
+                              isMyCrop={userName === data.user_name}
                             />
                           );
                         }
