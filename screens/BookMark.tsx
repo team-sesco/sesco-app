@@ -107,9 +107,9 @@ const BookMark = ({
       <HeadSeparator />
       <Container>
         <MainTitle text="모든 북마크" />
-        <Wrapper isBookMark={bookMarkData.length !== 0}>
-          {bookMarkData.length !== 0 ? (
-            bookMarkData.map((data, index) => {
+        {bookMarkData.length !== 0 ? (
+          <Wrapper isBookMark={bookMarkData.length !== 0}>
+            {bookMarkData.map((data, index) => {
               return (
                 <BookMarkButton
                   key={index}
@@ -134,14 +134,14 @@ const BookMark = ({
                   }
                 />
               );
-            })
-          ) : (
-            <NoBookMarkView>
-              <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={40} />
-              <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
-            </NoBookMarkView>
-          )}
-        </Wrapper>
+            })}
+          </Wrapper>
+        ) : (
+          <NoBookMarkView>
+            <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
+            <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
+          </NoBookMarkView>
+        )}
       </Container>
     </>
   );
