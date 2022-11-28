@@ -172,10 +172,10 @@ const MyProfile = () => {
               setUserImg(response.result);
               const changeResponse = await fetch(`${BASE_URI}/api/v1/users/me`, {
                 method: 'PUT',
-                body: {
+                body: JSON.stringify({
                   img: response.result,
                   name: userName,
-                },
+                }),
                 headers: {
                   Authorization: `Bearer ${jwtToken}`,
                   'Content-Type': 'application/json',
