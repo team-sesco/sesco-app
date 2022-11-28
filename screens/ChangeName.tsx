@@ -144,9 +144,9 @@ const ChangeName = () => {
   }, [changeUserName]);
 
   const validateName = () => {
-    if (changeUserName.length < 3 || changeUserName.length > 15) {
+    if (changeUserName.length < 3 || changeUserName.length > 20) {
       setIsValid(false);
-      setNameDetail('닉네임은 3~15자리만 가능합니다.');
+      setNameDetail('닉네임은 3~20자리만 가능합니다.');
       return;
     }
 
