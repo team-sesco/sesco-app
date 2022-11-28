@@ -123,6 +123,11 @@ const MyProfile = () => {
     }
   };
 
+  const goToChangeName = () => {
+    //@ts-ignore
+    navigation.navigate('ChangeName');
+  };
+
   const goBack = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: 'Main' }] });
@@ -232,7 +237,7 @@ const MyProfile = () => {
         </Container>
         <SeparateView />
         <Container>
-          <ContentWrapperButton style={{ marginTop: -10 }}>
+          <ContentWrapperButton style={{ marginTop: -10 }} onPress={goToChangeName}>
             <ContentSubject>닉네임 변경</ContentSubject>
             <Ionicons name="chevron-forward" color="rgba(0,0,0,0.7)" size={24} />
           </ContentWrapperButton>

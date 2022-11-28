@@ -5,6 +5,7 @@ import Login from '../screens/Login/Login';
 import DetectPestResult from '../screens/DetectPestResult';
 import Drawer from './Drawer';
 import Map from '../screens/Map';
+import ChangeName from '../screens/ChangeName';
 import BookMark from '../screens/BookMark';
 import AlreadyDetectPestResult from '../screens/AlreadyDetectPestResult';
 import MyDetection from '../screens/MyDetection';
@@ -29,6 +30,7 @@ const Root = ({ jwtToken }) => {
       <Nav.Screen name="DetectPestResult" component={DetectPestResult} />
       <Nav.Screen name="AlreadyDetectPestResult" component={AlreadyDetectPestResult} />
       <Nav.Screen name="BookMark" component={BookMark} />
+      <Nav.Screen name="ChangeName" component={ChangeName} />
       <Nav.Screen name="SameLogin" component={Login} />
     </Nav.Navigator>
   );
