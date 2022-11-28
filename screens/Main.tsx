@@ -243,9 +243,13 @@ const Main = () => {
       },
     })
       .then((res) => res.json())
-      .then((response) => {
+      .then(async (response) => {
         if (response.msg === 'success') {
           setDetectData(response.result);
+        } else if (!!response.description.includes('Bad access token')) {
+          Alert.alert('세션이 만료되었습니다.', '다시 로그인 해주세요.');
+          await AsyncStorage.clear();
+          navigation.reset({ routes: [{ name: 'SameLogin' }] });
         }
       });
   };
