@@ -54,6 +54,7 @@ const ProfileImageWrapper = styled.View`
 const ProfileImage = styled.Image`
   width: 70px;
   height: 70px;
+  border-radius: 35px;
 `;
 const ProfileImageChangeButton = styled.TouchableOpacity`
   position: absolute;
@@ -108,6 +109,11 @@ const MyProfile = () => {
       getUserInfo(result);
     });
   }, []);
+  useEffect(() => {
+    if (jwtToken) {
+      getUserInfo(jwtToken);
+    }
+  }, [userImg]);
 
   const getUserInfo = async (jwtToken) => {
     const response = await fetch(`${BASE_URI}/api/v1/users/me`, {
@@ -183,6 +189,9 @@ const MyProfile = () => {
               }).then((res) => res.json());
 
               if (changeResponse.msg === 'created') {
+                setUserImg(
+                  'https://sesco-s3.s3.ap-northeast-2.amazonaws.com/profile/white_background.png'
+                );
                 Alert.alert('사진이 변경되었습니다!');
               }
             } else if (response.description.includes('extension')) {
