@@ -14,6 +14,21 @@ import { AntDesign } from '@expo/vector-icons';
 import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+const LoadingBackground = styled.View<{ isLoading: boolean }>`
+  position: absolute;
+  z-index: 10;
+  display: ${(props) => (props.isLoading ? 'flex' : 'none')};
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+`;
+const LoadingGIF = styled.Image`
+  width: 120px;
+  height: 120px;
+`;
+
 const Container = styled.View`
   width: 95%;
   height: 100%;
@@ -23,6 +38,7 @@ const Container = styled.View`
 
 const Wrapper = styled.ScrollView<{ isBookMark: boolean }>`
   display: ${(props) => (props.isBookMark ? 'flex' : 'none')};
+  margin-bottom: 80px;
 `;
 
 const NoBookMarkView = styled.View`
@@ -38,7 +54,7 @@ const NoBookMarkText = styled.Text`
 
 const BookMark = ({
   route: {
-    params: { jwtToken },
+    params: { jwtToken, userName },
   },
 }) => {
   const navigation = useNavigation();
@@ -74,6 +90,7 @@ const BookMark = ({
     if (response.msg === 'success') {
       navigation.navigate('AlreadyDetectPestResult', {
         response,
+        userName,
       });
 
       setIsReady(true);
@@ -85,12 +102,15 @@ const BookMark = ({
 
   return (
     <>
+      <LoadingBackground isLoading={!isReady}>
+        <LoadingGIF source={require('../assets/pa.gif')} />
+      </LoadingBackground>
       <HeadSeparator />
       <Container>
         <MainTitle text="모든 북마크" />
-        <Wrapper isBookMark={bookMarkData.length !== 0}>
-          {bookMarkData.length !== 0 ? (
-            bookMarkData.map((data, index) => {
+        {bookMarkData.length !== 0 ? (
+          <Wrapper isBookMark={bookMarkData.length !== 0}>
+            {bookMarkData.map((data, index) => {
               return (
                 <BookMarkButton
                   key={index}
@@ -110,19 +130,20 @@ const BookMark = ({
                   }
                   cropLocation={data.detection_location.address_name}
                   cropName={data.detection_category}
-                  isCropPest={
+                  cropPest={
                     data.detection_result.name.includes('정상') ? '정상' : '병해충 탐지됨'
                   }
+                  isMyCrop={userName === data.user_name}
                 />
               );
-            })
-          ) : (
-            <NoBookMarkView>
-              <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={40} />
-              <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
-            </NoBookMarkView>
-          )}
-        </Wrapper>
+            })}
+          </Wrapper>
+        ) : (
+          <NoBookMarkView>
+            <AntDesign name="closecircleo" color="rgba(0,0,0,0.5)" size={30} />
+            <NoBookMarkText>등록된 북마크가 없습니다.</NoBookMarkText>
+          </NoBookMarkView>
+        )}
       </Container>
     </>
   );

@@ -8,6 +8,8 @@ import carrotGIF from '../assets/carrot.gif';
 import { BASE_URI } from '../api/api';
 import MapView, { Callout, Marker } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -28,6 +30,7 @@ const Background = styled.View`
   height: 100%;
   background-color: #f7fbf9;
 `;
+const TopContainer = styled.View``;
 const PestPhoto = styled.Image<{ phoneWidth: number }>`
   width: ${(props) => props.phoneWidth}px;
   height: 300px;
@@ -35,6 +38,14 @@ const PestPhoto = styled.Image<{ phoneWidth: number }>`
   max-height: 800px;
   min-height: 200px;
   margin: 0 auto;
+`;
+const ReportButton = styled.TouchableOpacity`
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
 `;
 const ContentContainer = styled.View`
   margin: 0 auto;
@@ -133,6 +144,7 @@ const ArrowBorder = styled.View`
 const AlreadyDetectPestResult = ({
   route: {
     params: {
+      userName: currentUser,
       response: {
         result: {
           _id: detection_oid,
@@ -148,6 +160,7 @@ const AlreadyDetectPestResult = ({
     },
   },
 }) => {
+  const navigation = useNavigation();
   const [jwtToken, setJwtToken] = useState('');
   const [isReady, setIsReady] = useState(true);
   const scrollViewRef = useRef();
@@ -378,19 +391,36 @@ const AlreadyDetectPestResult = ({
     setIsFontSize(true);
   };
 
+  const goToReport = () => {
+    //@ts-ignore
+    navigation.navigate('Report', { jwtToken, detection_oid, userName, currentUser });
+  };
+
   return (
     <>
       <LoadingBackground isLoading={!isReady}>
         <LoadingGIF source={carrotGIF} />
       </LoadingBackground>
       <Background>
-        {isResult ? (
-          <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
-        ) : isReady ? (
-          <PestPhoto source={{ uri: visualUri }} phoneWidth={PHONE_WIDTH} />
-        ) : (
-          <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
-        )}
+        <TopContainer>
+          {isResult ? (
+            <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
+          ) : isReady ? (
+            <PestPhoto source={{ uri: visualUri }} phoneWidth={PHONE_WIDTH} />
+          ) : (
+            <PestPhoto source={{ uri: photoUri }} phoneWidth={PHONE_WIDTH} />
+          )}
+          {currentUser !== userName ? (
+            <ReportButton>
+              <MaterialIcons
+                onPress={goToReport}
+                name="report"
+                size={35}
+                color="rgba(175, 38, 38, 0.9)"
+              />
+            </ReportButton>
+          ) : null}
+        </TopContainer>
         <ContentContainer>
           <PestMode>
             <PestResult

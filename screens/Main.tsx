@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { Octicons, Ionicons, AntDesign, SimpleLineIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import HeadSeparator from '../components/HeadSeparator';
 import BookMarkButton from '../components/BookMarkButton';
 import carrot from '../assets/carrot.gif';
@@ -184,17 +184,17 @@ const Main = () => {
   const [isReady, setIsReady] = useState(true);
   const [bookMarkData, setBookMarkData] = useState([]);
   const [detectData, setDetectData] = useState([]);
+  const isFocused = useIsFocused();
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
       setJwtToken(result);
+      getBookMark(result);
+      getDetectCrop(result);
+      getUserInfo(result);
     });
-  }, []);
-
-  useEffect(() => {
-    getBookMark();
-    getDetectCrop();
-  }, [jwtToken]);
+  }, [isFocused]);
 
   const openLink = async () => {
     await WebBrowser.openBrowserAsync(
@@ -204,12 +204,17 @@ const Main = () => {
 
   const goToMyDetection = () => {
     //@ts-ignore
-    navigation.navigate('MyDetection', { jwtToken });
+    navigation.navigate('MyDetection', { jwtToken, userName });
   };
 
   const goToMap = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: 'Map' }] });
+  };
+
+  const goToSearch = () => {
+    //@ts-ignore
+    navigation.navigate('Search', { jwtToken, userName });
   };
 
   const goToDetectPest = () => {
@@ -221,10 +226,23 @@ const Main = () => {
 
   const goToBookMark = () => {
     //@ts-ignore
-    navigation.navigate('BookMark', { jwtToken });
+    navigation.navigate('BookMark', { jwtToken, userName });
   };
 
-  const getBookMark = async () => {
+  const getUserInfo = async (jwtToken) => {
+    const response = await fetch(`${BASE_URI}/api/v1/users/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      setUserName(response.result.name);
+    }
+  };
+
+  const getBookMark = async (jwtToken) => {
     const response = await fetch(`${BASE_URI}/api/v1/bookmarks?limit=15`, {
       method: 'GET',
       headers: {
@@ -237,7 +255,7 @@ const Main = () => {
     }
   };
 
-  const getDetectCrop = async () => {
+  const getDetectCrop = async (jwtToken) => {
     await fetch(`${BASE_URI}/api/v1/detection?limit=10`, {
       method: 'GET',
       headers: {
@@ -245,9 +263,13 @@ const Main = () => {
       },
     })
       .then((res) => res.json())
-      .then((response) => {
+      .then(async (response) => {
         if (response.msg === 'success') {
           setDetectData(response.result);
+        } else if (!!response.description.includes('Bad access token')) {
+          Alert.alert('세션이 만료되었습니다.', '다시 로그인 해주세요.');
+          await AsyncStorage.clear();
+          navigation.reset({ routes: [{ name: 'SameLogin' }] });
         }
       });
   };
@@ -264,6 +286,7 @@ const Main = () => {
     if (response.msg === 'success') {
       navigation.navigate('AlreadyDetectPestResult', {
         response,
+        userName,
       });
 
       setIsReady(true);
@@ -288,7 +311,7 @@ const Main = () => {
             </HeaderButton>
           </LeftHeader>
           <RightHeader>
-            <HeaderButton>
+            <HeaderButton onPress={goToSearch}>
               <AntDesign
                 name="search1"
                 color="#98A1BD"
@@ -374,11 +397,12 @@ const Main = () => {
                               }
                               cropLocation={data.detection_location.address_name}
                               cropName={data.detection_category}
-                              isCropPest={
+                              cropPest={
                                 data.detection_result.name.includes('정상')
                                   ? '정상'
                                   : '병해충 탐지됨'
                               }
+                              isMyCrop={userName === data.user_name}
                             />
                           );
                         }
