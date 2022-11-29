@@ -562,6 +562,7 @@ const AlreadyDetectPestResult = ({
                       );
                     })
                   : null}
+                <Marker coordinate={{ longitude: longitude, latitude: latitude }} />
               </MapView>
             </>
           ) : null}
