@@ -10,6 +10,8 @@ import carrotGIF from '../assets/carrot.gif';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
 import MapView, { Callout, Marker } from 'react-native-maps';
+import * as Animatable from 'react-native-animatable';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -130,11 +132,29 @@ const ArrowBorder = styled.View`
   border-width: 16px;
   margin-top: -0.5px;
 `;
+
+const AbsoluteView = styled.View`
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  align-items: center;
+`;
+
+const NotifyText = styled.Text`
+  margin-left: 20px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+`;
+
 const DetectPestResult = ({
   route: {
     params: {
       response: {
         result: {
+          is_detected,
           created_at,
           detection_oid,
           location: userLocation,
@@ -166,6 +186,15 @@ const DetectPestResult = ({
   const [preparation, setPreparation] = useState('');
   const [neighborResult, setNeighborResult] = useState([]);
   const [symptom, setSymptom] = useState('');
+  const heightTranslate = {
+    0: {
+      translateY: -100,
+    },
+
+    1: {
+      translateY: 50,
+    },
+  };
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
@@ -401,6 +430,34 @@ const DetectPestResult = ({
 
   return (
     <>
+      {is_detected ? (
+        <AbsoluteView>
+          <Animatable.View
+            animation={heightTranslate}
+            duration={2000}
+            iterationCount={2}
+            direction="alternate"
+            easing={'ease-out-expo'}
+            useNativeDriver={true}
+            style={{
+              width: '90%',
+              height: 50,
+              top: 0,
+              backgroundColor: 'rgba(59,150,96,0.8)',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 30,
+              borderColor: 'rgba(9,9,9,0.2)',
+              borderStyle: 'solid',
+              borderWidth: 1,
+            }}
+          >
+            <MaterialCommunityIcons name="alarm-light-outline" size={26} color="#FFF" />
+            <NotifyText>병해충이 탐지되었습니다.</NotifyText>
+          </Animatable.View>
+        </AbsoluteView>
+      ) : null}
       <LoadingBackground isLoading={!isReady}>
         <LoadingGIF source={carrotGIF} />
       </LoadingBackground>
