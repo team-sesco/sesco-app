@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { Octicons, Ionicons, AntDesign, SimpleLineIcons } from '@expo/vector-icons';
+import {
+  Octicons,
+  Ionicons,
+  AntDesign,
+  SimpleLineIcons,
+  MaterialCommunityIcons,
+} from '@expo/vector-icons';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import HeadSeparator from '../components/HeadSeparator';
 import BookMarkButton from '../components/BookMarkButton';
@@ -16,6 +22,8 @@ import { BASE_URI } from '../api/api';
 import CurrentDetectButton from '../components/CurrentDetectButton';
 import * as WebBrowser from 'expo-web-browser';
 import { Alert } from 'react-native';
+import * as Location from 'expo-location';
+import { KAKAO_REST_API_KEY } from '../environment/env';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -186,13 +194,38 @@ const Main = () => {
   const [detectData, setDetectData] = useState([]);
   const isFocused = useIsFocused();
   const [userName, setUserName] = useState('');
+  useEffect(() => {
+    getUserLocationIfGranted();
+  }, []);
+
+  const getUserLocationIfGranted = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === 'granted') {
+      const {
+        coords: { longitude, latitude },
+      } = await Location.getCurrentPositionAsync({ accuracy: 3 });
+
+      await fetch(
+        `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${longitude}&y=${latitude}`,
+        {
+          headers: {
+            Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
+          },
+        }
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          setUserLocation(json.documents[0]);
+        });
+    }
+  };
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
       setJwtToken(result);
+      getUserInfo(result);
       getBookMark(result);
       getDetectCrop(result);
-      getUserInfo(result);
     });
   }, [isFocused]);
 
@@ -209,7 +242,7 @@ const Main = () => {
 
   const goToMap = () => {
     //@ts-ignore
-    navigation.reset({ routes: [{ name: 'Map' }] });
+    navigation.reset({ routes: [{ name: 'Map', params: { jwtToken, userName } }] });
   };
 
   const goToSearch = () => {
@@ -350,7 +383,7 @@ const Main = () => {
           </NormalBtnWrapper>
           <VSeparator />
           <VSeparator />
-          <Title>즐겨찾는 나의 작물</Title>
+          <Title>북마크</Title>
           <Swiper
             activeDotColor="#3b9660"
             style={{
@@ -364,7 +397,7 @@ const Main = () => {
                   : 350,
             }}
           >
-            {bookMarkData.length !== 0 ? (
+            {bookMarkData.length !== 0 && !!userName ? (
               bookMarkData
                 .filter((_, filterIndex) => filterIndex % 3 === 0)
                 .map((_, index) => {
