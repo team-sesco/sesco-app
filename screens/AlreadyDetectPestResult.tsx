@@ -8,7 +8,7 @@ import carrotGIF from '../assets/carrot.gif';
 import { BASE_URI } from '../api/api';
 import MapView, { Callout, Marker } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
@@ -41,6 +41,7 @@ const PestPhoto = styled.Image<{ phoneWidth: number }>`
 `;
 const ReportButton = styled.TouchableOpacity`
   position: absolute;
+  padding: 2px;
   right: 10px;
   bottom: 10px;
   background-color: #ffffff;
@@ -155,6 +156,7 @@ const AlreadyDetectPestResult = ({
           location: { address_name: userLocation, x: longitude, y: latitude },
           model_result: { name: pestResult, unidentified, img: visualUriTemp, ratio },
           user_name: userName,
+          location,
         },
       },
     },
@@ -174,6 +176,7 @@ const AlreadyDetectPestResult = ({
   const [chatsArr, setChatsArr] = useState([{}]);
   const [preparation, setPreparation] = useState('');
   const [symptom, setSymptom] = useState('');
+  const [neighborResult, setNeighborResult] = useState([]);
   const graphData = {
     labels: ratio.name,
     datasets: [
@@ -391,6 +394,23 @@ const AlreadyDetectPestResult = ({
     setIsFontSize(true);
   };
 
+  const getNeighborResult = async () => {
+    await fetch(`${BASE_URI}/api/v1/detection/map`, {
+      method: 'POST',
+      body: JSON.stringify({
+        location: location,
+      }),
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        setNeighborResult(json.result);
+      });
+  };
+
   const goToReport = () => {
     //@ts-ignore
     navigation.navigate('Report', { jwtToken, detection_oid, userName, currentUser });
@@ -412,9 +432,9 @@ const AlreadyDetectPestResult = ({
           )}
           {currentUser !== userName ? (
             <ReportButton>
-              <MaterialIcons
+              <Ionicons
                 onPress={goToReport}
-                name="report"
+                name="megaphone"
                 size={35}
                 color="rgba(175, 38, 38, 0.9)"
               />
@@ -435,6 +455,7 @@ const AlreadyDetectPestResult = ({
               onPress={() => {
                 setIsResult(false);
                 getVisual();
+                getNeighborResult();
                 setIsVisual(true);
               }}
             >
@@ -498,45 +519,49 @@ const AlreadyDetectPestResult = ({
                 showsUserLocation={true}
                 rotateEnabled={false}
                 pitchEnabled={false}
+                zoomEnabled={false}
+                zoomTapEnabled={false}
+                scrollEnabled={false}
                 initialRegion={{
                   latitude: latitude,
                   longitude: longitude,
-                  latitudeDelta: 0.005,
-                  longitudeDelta: 0.005,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
                 }}
               >
-                <Marker
-                  onPress={() => console.log('ㄴ누ㄹ렀음')}
-                  coordinate={{ latitude: 37.5873767, longitude: 127.097316501 }}
-                  image={require('../assets/location5.png')}
-                >
-                  <Callout tooltip>
-                    <LocationContainer>
-                      <LocationBubble>
-                        <LocationText>콩 점무늬병</LocationText>
-                        <LocationImage source={require('../assets/cong.jpg')} />
-                      </LocationBubble>
-                      <ArrowBorder></ArrowBorder>
-                      <Arrow></Arrow>
-                    </LocationContainer>
-                  </Callout>
-                </Marker>
-
-                <Marker
-                  coordinate={{ latitude: latitude, longitude: longitude }}
-                  image={require('../assets/location5.png')}
-                >
-                  <Callout tooltip>
-                    <LocationContainer>
-                      <LocationBubble>
-                        <LocationText>콩 점무늬병</LocationText>
-                        <LocationImage source={require('../assets/cong.jpg')} />
-                      </LocationBubble>
-                      <ArrowBorder></ArrowBorder>
-                      <Arrow></Arrow>
-                    </LocationContainer>
-                  </Callout>
-                </Marker>
+                {neighborResult.length !== 0
+                  ? neighborResult.map((data, index) => {
+                      return detection_oid !== data._id ? (
+                        <Marker
+                          key={index}
+                          coordinate={{
+                            longitude: data.location.x,
+                            latitude: data.location.y,
+                          }}
+                          image={require('../assets/location5.png')}
+                        >
+                          <Callout tooltip>
+                            <LocationContainer>
+                              <LocationBubble>
+                                <LocationText>{data.model_result.name}</LocationText>
+                                <LocationImage source={{ uri: data.img }} />
+                              </LocationBubble>
+                              <ArrowBorder></ArrowBorder>
+                              <Arrow></Arrow>
+                            </LocationContainer>
+                          </Callout>
+                        </Marker>
+                      ) : (
+                        <Marker
+                          key={index}
+                          coordinate={{
+                            longitude: data.location.x,
+                            latitude: data.location.y,
+                          }}
+                        />
+                      );
+                    })
+                  : null}
               </MapView>
             </>
           ) : null}

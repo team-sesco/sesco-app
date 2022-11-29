@@ -145,6 +145,7 @@ const DetectPestResult = ({
       photoUri,
       userCrop: { cropName },
       userLocation: { x: longitude, y: latitude },
+      userLocation: locationObj,
     },
   },
 }) => {
@@ -163,6 +164,7 @@ const DetectPestResult = ({
   const [graphData, setGraphData] = useState({});
   const [chatsArr, setChatsArr] = useState([{}]);
   const [preparation, setPreparation] = useState('');
+  const [neighborResult, setNeighborResult] = useState([]);
   const [symptom, setSymptom] = useState('');
 
   useEffect(() => {
@@ -379,6 +381,24 @@ const DetectPestResult = ({
     setIsFontSize(true);
   };
 
+  const getNeighborResult = async () => {
+    await fetch(`${BASE_URI}/api/v1/detection/map`, {
+      method: 'POST',
+      body: JSON.stringify({
+        location: locationObj,
+      }),
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        setNeighborResult(json.result);
+        console.log(userLocation);
+      });
+  };
+
   return (
     <>
       <LoadingBackground isLoading={!isReady}>
@@ -406,6 +426,7 @@ const DetectPestResult = ({
               onPress={() => {
                 setIsResult(false);
                 getVisual();
+                getNeighborResult();
                 setIsVisual(true);
               }}
             >
@@ -469,44 +490,49 @@ const DetectPestResult = ({
                 showsUserLocation={true}
                 rotateEnabled={false}
                 pitchEnabled={false}
+                zoomEnabled={false}
+                zoomTapEnabled={false}
+                scrollEnabled={false}
                 initialRegion={{
                   latitude: latitude,
                   longitude: longitude,
-                  latitudeDelta: 0.005,
-                  longitudeDelta: 0.005,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
                 }}
               >
-                <Marker
-                  coordinate={{ latitude: 37.5873767, longitude: 127.097316501 }}
-                  image={require('../assets/location5.png')}
-                >
-                  <Callout tooltip>
-                    <LocationContainer>
-                      <LocationBubble>
-                        <LocationText>콩 점무늬병</LocationText>
-                        <LocationImage source={require('../assets/cong.jpg')} />
-                      </LocationBubble>
-                      <ArrowBorder></ArrowBorder>
-                      <Arrow></Arrow>
-                    </LocationContainer>
-                  </Callout>
-                </Marker>
-
-                <Marker
-                  coordinate={{ latitude: latitude, longitude: longitude }}
-                  image={require('../assets/location5.png')}
-                >
-                  <Callout tooltip>
-                    <LocationContainer>
-                      <LocationBubble>
-                        <LocationText>콩 점무늬병</LocationText>
-                        <LocationImage source={require('../assets/cong.jpg')} />
-                      </LocationBubble>
-                      <ArrowBorder></ArrowBorder>
-                      <Arrow></Arrow>
-                    </LocationContainer>
-                  </Callout>
-                </Marker>
+                {neighborResult.length !== 0
+                  ? neighborResult.map((data, index) => {
+                      return detection_oid !== data._id ? (
+                        <Marker
+                          key={index}
+                          coordinate={{
+                            longitude: data.location.x,
+                            latitude: data.location.y,
+                          }}
+                          image={require('../assets/location5.png')}
+                        >
+                          <Callout tooltip>
+                            <LocationContainer>
+                              <LocationBubble>
+                                <LocationText>{data.model_result.name}</LocationText>
+                                <LocationImage source={{ uri: data.img }} />
+                              </LocationBubble>
+                              <ArrowBorder></ArrowBorder>
+                              <Arrow></Arrow>
+                            </LocationContainer>
+                          </Callout>
+                        </Marker>
+                      ) : (
+                        <Marker
+                          key={index}
+                          coordinate={{
+                            longitude: data.location.x,
+                            latitude: data.location.y,
+                          }}
+                        />
+                      );
+                    })
+                  : null}
               </MapView>
             </>
           ) : null}
