@@ -402,7 +402,7 @@ const Main = () => {
                                   ? '정상'
                                   : '병해충 탐지됨'
                               }
-                              isMyCrop={userName === data.user_name}
+                              isMyCrop={data.is_me}
                             />
                           );
                         }
