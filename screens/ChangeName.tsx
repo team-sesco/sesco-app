@@ -197,6 +197,10 @@ const ChangeName = () => {
       setIsReady(true);
       goBack();
       return;
+    } else if (changeResponse.description.includes('중복')) {
+      Alert.alert('이미 존재하는 닉네임입니다.');
+      setIsReady(true);
+      return;
     }
     Alert.alert('오류가 발생하였습니다.');
     setIsReady(true);
