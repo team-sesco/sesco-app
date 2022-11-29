@@ -190,7 +190,6 @@ const MyProfile = () => {
                 method: 'PUT',
                 body: JSON.stringify({
                   img: response.result,
-                  name: userName,
                 }),
                 headers: {
                   Authorization: `Bearer ${jwtToken}`,

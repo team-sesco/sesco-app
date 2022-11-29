@@ -184,7 +184,6 @@ const ChangeName = () => {
     const changeResponse = await fetch(`${BASE_URI}/api/v1/users/me`, {
       method: 'PUT',
       body: JSON.stringify({
-        img: userImg,
         name: changeUserName,
       }),
       headers: {
