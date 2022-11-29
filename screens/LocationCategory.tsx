@@ -290,6 +290,8 @@ const LocationCategory = () => {
                     Alert.alert('지원하지 않는 지역입니다!');
                     return;
                   }
+                  setUserLatitude(userRegion.latitude);
+                  setUserLongitude(userRegion.longitude);
                   setDetailLocation(json.documents[0]);
                   setUserLocation(json.documents[0].address_name);
                 });
