@@ -24,6 +24,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { KAKAO_REST_API_KEY } from '../environment/env';
+import * as Animatable from 'react-native-animatable';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -186,6 +187,22 @@ const WidthSeparator = styled.View`
   width: 10px;
 `;
 
+const AbsoluteView = styled.View`
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  align-items: center;
+`;
+
+const NotifyText = styled.Text`
+  margin-left: 20px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+`;
+
 const Main = () => {
   const navigation = useNavigation();
   const [jwtToken, setJwtToken] = useState('');
@@ -194,6 +211,18 @@ const Main = () => {
   const [detectData, setDetectData] = useState([]);
   const isFocused = useIsFocused();
   const [userName, setUserName] = useState('');
+  const [userLocation, setUserLocation] = useState([]);
+  const [isNotify, setIsNotify] = useState(false);
+  const heightTranslate = {
+    0: {
+      translateY: -100,
+    },
+
+    1: {
+      translateY: 50,
+    },
+  };
+
   useEffect(() => {
     getUserLocationIfGranted();
   }, []);
@@ -218,6 +247,34 @@ const Main = () => {
           setUserLocation(json.documents[0]);
         });
     }
+  };
+
+  useEffect(() => {
+    if (!jwtToken || userLocation.length === 0) return;
+    fetchData();
+    const dataInterval = setInterval(() => fetchData(), 10000);
+    return () => clearInterval(dataInterval);
+  }, [jwtToken, userLocation]);
+
+  const fetchData = async () => {
+    await fetch(
+      `${BASE_URI}/api/v1/detection/recent?time=10&location=${userLocation.region_3depth_name}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.result.is_detected === true) {
+          setIsNotify(true);
+          return;
+        }
+        setIsNotify(false);
+      });
   };
 
   useEffect(() => {
@@ -331,6 +388,34 @@ const Main = () => {
 
   return (
     <>
+      {isNotify ? (
+        <AbsoluteView>
+          <Animatable.View
+            animation={heightTranslate}
+            duration={2000}
+            iterationCount={2}
+            direction="alternate"
+            easing={'ease-out-expo'}
+            useNativeDriver={true}
+            style={{
+              width: '90%',
+              height: 50,
+              top: 0,
+              backgroundColor: 'rgba(59,150,96,0.8)',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 30,
+              borderColor: 'rgba(9,9,9,0.2)',
+              borderStyle: 'solid',
+              borderWidth: 1,
+            }}
+          >
+            <MaterialCommunityIcons name="alarm-light-outline" size={26} color="#FFF" />
+            <NotifyText>주변에 병해충이 탐지되었습니다.</NotifyText>
+          </Animatable.View>
+        </AbsoluteView>
+      ) : null}
       <LoadingBackground isLoading={!isReady}>
         <LoadingGIF source={require('../assets/pa.gif')} />
       </LoadingBackground>
