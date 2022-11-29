@@ -364,6 +364,29 @@ const Main = () => {
       });
   };
 
+  const goToNotification = async () => {
+    //@ts-ignore
+    setIsReady(false);
+    const response = await fetch(`${BASE_URI}/api/v1/notification`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      navigation.navigate('Notification', {
+        response,
+      });
+
+      setIsReady(true);
+      return;
+    }
+
+    setIsReady(true);
+    Alert.alert('잠시 후 다시 시도해주세요!');
+  };
+
   const goToDetectResult = async (detectionId) => {
     setIsReady(false);
     const response = await fetch(`${BASE_URI}/api/v1/detection/${detectionId}`, {
@@ -437,7 +460,7 @@ const Main = () => {
                 style={{ marginRight: 15 }}
               />
             </HeaderButton>
-            <HeaderButton>
+            <HeaderButton onPress={goToNotification}>
               <SimpleLineIcons name="bell" color="#98A1BD" size={28} />
             </HeaderButton>
           </RightHeader>

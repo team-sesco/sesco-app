@@ -12,6 +12,7 @@ import MyDetection from '../screens/MyDetection';
 import DeleteUser from '../screens/DeleteUser';
 import Search from '../screens/Search';
 import Report from '../screens/Report';
+import Notification from '../screens/Notification';
 
 const Nav = createNativeStackNavigator();
 
@@ -28,6 +29,7 @@ const Root = ({ jwtToken }) => {
       {!jwtToken ? <Nav.Screen name="Login" component={Login} /> : null}
       <Nav.Screen name="Drawer" component={Drawer} />
       <Nav.Screen name="Search" component={Search} />
+      <Nav.Screen name="Notification" component={Notification} />
       <Nav.Screen name="Map" component={Map} />
       <Nav.Screen name="Stack" component={Stack} />
       <Nav.Screen name="MyDetection" component={MyDetection} />
