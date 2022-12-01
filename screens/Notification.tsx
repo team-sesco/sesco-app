@@ -37,9 +37,10 @@ const ContentBox = styled.View`
   border-radius: 20px;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
 `;
-const ContentNew = styled.View`
+const ContentNew = styled.View<{ isNew: boolean }>`
   height: 20px;
   margin-bottom: 10px;
+  display: ${(props) => (props.isNew ? 'flex' : 'none')};
 `;
 const ContentNewWrapper = styled.View`
   background-color: #f73e3e;
@@ -114,7 +115,13 @@ const Notification = ({
               result.map((data, index) => {
                 return (
                   <ContentBox key={index}>
-                    <ContentNew>
+                    <ContentNew
+                      isNew={
+                        !elapsedTime(data.created_at).includes('일') &&
+                        !elapsedTime(data.created_at).includes('개월') &&
+                        !elapsedTime(data.created_at).includes('년')
+                      }
+                    >
                       <ContentNewWrapper>
                         <ContentNewText
                           isNew={
@@ -136,7 +143,7 @@ const Notification = ({
               <ContentBox>
                 <ContentNew>
                   <ContentNewWrapper>
-                    <ContentNewText>NO NOTIFICATION</ContentNewText>
+                    <ContentNewText isNew={true}>NO NOTIFICATION</ContentNewText>
                   </ContentNewWrapper>
                 </ContentNew>
                 <ContentText style={{ fontSize: 20, marginBottom: 30 }}>
