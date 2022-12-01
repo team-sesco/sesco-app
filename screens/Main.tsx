@@ -269,11 +269,13 @@ const Main = () => {
     )
       .then((res) => res.json())
       .then((json) => {
-        if (json.result.is_detected === true) {
-          setIsNotify(true);
-          return;
+        if (json.result.is_detected !== undefined) {
+          if (json.result.is_detected === true) {
+            setIsNotify(true);
+            return;
+          }
+          setIsNotify(false);
         }
-        setIsNotify(false);
       });
   };
 
