@@ -171,6 +171,7 @@ const Search = ({
             <SearchText
               maxlength={20}
               placeholder="작물명, 병해충명, 지역명"
+              placeholderTextColor="rgba(0,0,0,0.2)"
               value={searchValue}
               onChangeText={setSearchValue}
               onSubmitEditing={submitSearchValue}
