@@ -9,6 +9,9 @@ import NormalButton from '../components/NormalButton';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import carrotGIF from '../assets/carrot.gif';
+import paGIF from '../assets/pa.gif';
+import kongGIF from '../assets/kong.gif';
+import gochuGIF from '../assets/gochu.gif';
 import { BASE_URI } from '../api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -132,7 +135,6 @@ const DetectPest = ({ route: { params } }) => {
                   aspect: [4, 4],
                   quality: 1,
                 });
-
                 if (!result.cancelled) {
                   setIsReady(false);
                   const formData = new FormData();
@@ -305,10 +307,22 @@ const DetectPest = ({ route: { params } }) => {
   return (
     <>
       <LoadingBackground isLoading={!isReady}>
-        <LoadingGIF source={carrotGIF} />
+        <LoadingGIF
+          source={
+            !userCrop
+              ? paGIF
+              : userCrop.cropName === '콩'
+              ? kongGIF
+              : userCrop.cropName === '파'
+              ? paGIF
+              : userCrop.cropName === '고추'
+              ? gochuGIF
+              : carrotGIF
+          }
+        />
       </LoadingBackground>
       <Background>
-        <Container showsVerticalScrollIndicator={false} r>
+        <Container showsVerticalScrollIndicator={false}>
           <Title statusBarHeight={STATUSBAR_HEIGHT}>병해충 탐지</Title>
           <Progress.Bar
             style={{ marginTop: 15 }}

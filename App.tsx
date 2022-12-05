@@ -6,6 +6,7 @@ import 'react-native-gesture-handler';
 
 export default function App() {
   const [jwtToken, setJwtToken] = useState('');
+
   AsyncStorage.getItem('jwtToken', (_, result) => {
     setJwtToken(result);
   });

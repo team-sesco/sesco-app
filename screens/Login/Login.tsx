@@ -50,6 +50,12 @@ const Login = () => {
     }
   };
 
+  const openLink = async () => {
+    await WebBrowser.openBrowserAsync(
+      'https://brass-payment-372.notion.site/SE-SCO-50712a119a774442bc982b161948c6e2'
+    );
+  };
+
   return (
     <Container>
       <StatusBar barStyle={'dark-content'} />
@@ -60,7 +66,7 @@ const Login = () => {
       </LoginTopContainer>
       <LoginButtonContainer>
         <LoginButton
-          onPress={goToMain}
+          onPress={() => openLink()}
           text="병해충 진단 미리보기"
           bgColor={'#FFF'}
           marginBottom={40}

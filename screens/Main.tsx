@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { Octicons, Ionicons, AntDesign, SimpleLineIcons } from '@expo/vector-icons';
+import {
+  Octicons,
+  Ionicons,
+  AntDesign,
+  SimpleLineIcons,
+  MaterialCommunityIcons,
+} from '@expo/vector-icons';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import HeadSeparator from '../components/HeadSeparator';
 import BookMarkButton from '../components/BookMarkButton';
@@ -16,6 +22,9 @@ import { BASE_URI } from '../api/api';
 import CurrentDetectButton from '../components/CurrentDetectButton';
 import * as WebBrowser from 'expo-web-browser';
 import { Alert } from 'react-native';
+import * as Location from 'expo-location';
+import { KAKAO_REST_API_KEY } from '../environment/env';
+import * as Animatable from 'react-native-animatable';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -178,6 +187,22 @@ const WidthSeparator = styled.View`
   width: 10px;
 `;
 
+const AbsoluteView = styled.View`
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  align-items: center;
+`;
+
+const NotifyText = styled.Text`
+  margin-left: 20px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+`;
+
 const Main = () => {
   const navigation = useNavigation();
   const [jwtToken, setJwtToken] = useState('');
@@ -186,13 +211,80 @@ const Main = () => {
   const [detectData, setDetectData] = useState([]);
   const isFocused = useIsFocused();
   const [userName, setUserName] = useState('');
+  const [userLocation, setUserLocation] = useState([]);
+  const [isNotify, setIsNotify] = useState(false);
+  const heightTranslate = {
+    0: {
+      translateY: -100,
+    },
+
+    1: {
+      translateY: 50,
+    },
+  };
+
+  useEffect(() => {
+    getUserLocationIfGranted();
+  }, []);
+
+  const getUserLocationIfGranted = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === 'granted') {
+      const {
+        coords: { longitude, latitude },
+      } = await Location.getCurrentPositionAsync({ accuracy: 3 });
+
+      await fetch(
+        `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${longitude}&y=${latitude}`,
+        {
+          headers: {
+            Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
+          },
+        }
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          setUserLocation(json.documents[0]);
+        });
+    }
+  };
+
+  useEffect(() => {
+    if (!jwtToken || userLocation.length === 0) return;
+    fetchData();
+    const dataInterval = setInterval(() => fetchData(), 10000);
+    return () => clearInterval(dataInterval);
+  }, [jwtToken, userLocation]);
+
+  const fetchData = async () => {
+    await fetch(
+      `${BASE_URI}/api/v1/detection/recent?time=10&location=${userLocation.region_3depth_name}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.result.is_detected !== undefined) {
+          if (json.result.is_detected === true) {
+            setIsNotify(true);
+            return;
+          }
+          setIsNotify(false);
+        }
+      });
+  };
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
       setJwtToken(result);
+      getUserInfo(result);
       getBookMark(result);
       getDetectCrop(result);
-      getUserInfo(result);
     });
   }, [isFocused]);
 
@@ -209,7 +301,7 @@ const Main = () => {
 
   const goToMap = () => {
     //@ts-ignore
-    navigation.reset({ routes: [{ name: 'Map' }] });
+    navigation.reset({ routes: [{ name: 'Map', params: { jwtToken, userName } }] });
   };
 
   const goToSearch = () => {
@@ -274,6 +366,29 @@ const Main = () => {
       });
   };
 
+  const goToNotification = async () => {
+    //@ts-ignore
+    setIsReady(false);
+    const response = await fetch(`${BASE_URI}/api/v1/notification`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }).then((res) => res.json());
+
+    if (response.msg === 'success') {
+      navigation.navigate('Notification', {
+        response,
+      });
+
+      setIsReady(true);
+      return;
+    }
+
+    setIsReady(true);
+    Alert.alert('잠시 후 다시 시도해주세요!');
+  };
+
   const goToDetectResult = async (detectionId) => {
     setIsReady(false);
     const response = await fetch(`${BASE_URI}/api/v1/detection/${detectionId}`, {
@@ -298,6 +413,34 @@ const Main = () => {
 
   return (
     <>
+      {isNotify ? (
+        <AbsoluteView>
+          <Animatable.View
+            animation={heightTranslate}
+            duration={2000}
+            iterationCount={2}
+            direction="alternate"
+            easing={'ease-out-expo'}
+            useNativeDriver={true}
+            style={{
+              width: '90%',
+              height: 50,
+              top: 0,
+              backgroundColor: 'rgba(59,150,96,0.8)',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 30,
+              borderColor: 'rgba(9,9,9,0.2)',
+              borderStyle: 'solid',
+              borderWidth: 1,
+            }}
+          >
+            <MaterialCommunityIcons name="alarm-light-outline" size={26} color="#FFF" />
+            <NotifyText>주변에 병해충이 탐지되었습니다.</NotifyText>
+          </Animatable.View>
+        </AbsoluteView>
+      ) : null}
       <LoadingBackground isLoading={!isReady}>
         <LoadingGIF source={require('../assets/pa.gif')} />
       </LoadingBackground>
@@ -319,7 +462,7 @@ const Main = () => {
                 style={{ marginRight: 15 }}
               />
             </HeaderButton>
-            <HeaderButton>
+            <HeaderButton onPress={goToNotification}>
               <SimpleLineIcons name="bell" color="#98A1BD" size={28} />
             </HeaderButton>
           </RightHeader>
@@ -350,7 +493,7 @@ const Main = () => {
           </NormalBtnWrapper>
           <VSeparator />
           <VSeparator />
-          <Title>즐겨찾는 나의 작물</Title>
+          <Title>북마크</Title>
           <Swiper
             activeDotColor="#3b9660"
             style={{
@@ -358,13 +501,13 @@ const Main = () => {
                 bookMarkData.length === 0
                   ? 150
                   : bookMarkData.length === 1
-                  ? 150
+                  ? 120
                   : bookMarkData.length === 2
-                  ? 250
+                  ? 220
                   : 350,
             }}
           >
-            {bookMarkData.length !== 0 ? (
+            {bookMarkData.length !== 0 && !!userName ? (
               bookMarkData
                 .filter((_, filterIndex) => filterIndex % 3 === 0)
                 .map((_, index) => {
@@ -402,7 +545,7 @@ const Main = () => {
                                   ? '정상'
                                   : '병해충 탐지됨'
                               }
-                              isMyCrop={userName === data.user_name}
+                              isMyCrop={data.is_me}
                             />
                           );
                         }

@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
-import { useNavigation } from '@react-navigation/native';
-import { Dimensions, Platform, StatusBar } from 'react-native';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { Dimensions, Platform, View } from 'react-native';
 import ChatLeftBox from '../components/ChatLeftBox';
 import ChatRightBox from '../components/ChatRightBox';
 import { BarChart } from 'react-native-chart-kit';
 import carrotGIF from '../assets/carrot.gif';
+import paGIF from '../assets/pa.gif';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
 import MapView, { Callout, Marker } from 'react-native-maps';
+import * as Animatable from 'react-native-animatable';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const LoadingBackground = styled.View<{ isLoading: boolean }>`
   position: absolute;
@@ -95,10 +96,7 @@ const AskButtonText = styled.Text`
   color: #fff;
 `;
 
-const LocationContainer = styled.View`
-  /* left: 10px;
-  top: 10px; */
-`;
+const LocationContainer = styled.View``;
 const LocationBubble = styled.View`
   flex-direction: column;
   align-items: center;
@@ -121,6 +119,7 @@ const Arrow = styled.View`
   border-color: transparent;
   border-top-color: #fff;
   border-width: 16px;
+  align-self: center;
   margin-top: -32px;
 `;
 const ArrowBorder = styled.View`
@@ -128,13 +127,32 @@ const ArrowBorder = styled.View`
   border-color: transparent;
   border-top-color: #007a87;
   border-width: 16px;
+  align-self: center;
   margin-top: -0.5px;
 `;
+
+const AbsoluteView = styled.View`
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  align-items: center;
+`;
+
+const NotifyText = styled.Text`
+  margin-left: 20px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+`;
+
 const DetectPestResult = ({
   route: {
     params: {
       response: {
         result: {
+          is_detected,
           created_at,
           detection_oid,
           location: userLocation,
@@ -145,6 +163,7 @@ const DetectPestResult = ({
       photoUri,
       userCrop: { cropName },
       userLocation: { x: longitude, y: latitude },
+      userLocation: locationObj,
     },
   },
 }) => {
@@ -154,8 +173,6 @@ const DetectPestResult = ({
   const [isBookMark, setIsBookMark] = useState(false);
   const [isFontSize, setIsFontSize] = useState(false);
   const { width: PHONE_WIDTH } = Dimensions.get('window');
-  const STATUSBAR_HEIGHT =
-    Platform.OS === 'ios' ? getStatusBarHeight(true) : StatusBar.currentHeight;
   const [isResult, setIsResult] = useState(true);
   const [hasVisual, setHasVisual] = useState(false);
   const [isVisual, setIsVisual] = useState(false);
@@ -163,7 +180,17 @@ const DetectPestResult = ({
   const [graphData, setGraphData] = useState({});
   const [chatsArr, setChatsArr] = useState([{}]);
   const [preparation, setPreparation] = useState('');
+  const [neighborResult, setNeighborResult] = useState([]);
   const [symptom, setSymptom] = useState('');
+  const heightTranslate = {
+    0: {
+      translateY: -100,
+    },
+
+    1: {
+      translateY: 50,
+    },
+  };
 
   useEffect(() => {
     AsyncStorage.getItem('jwtToken', (_, result) => {
@@ -225,7 +252,6 @@ const DetectPestResult = ({
     ).then((res) => res.json());
 
     if (response.msg === 'success') {
-      console.log(response);
       setVisualUri(response.result.visualization);
       setGraphData({
         labels: response.result.ratio.name,
@@ -248,7 +274,7 @@ const DetectPestResult = ({
         headers: {
           Authorization: `Bearer ${jwtToken}`,
         },
-      }).then((res) => console.log(res.json()));
+      });
 
       tempChatsArr.push({ type: 'human', text: '북마크 해제해주세요!' });
       tempChatsArr.push({ type: 'bot', text: '북마크 해제하였습니다.' });
@@ -379,10 +405,55 @@ const DetectPestResult = ({
     setIsFontSize(true);
   };
 
+  const getNeighborResult = async () => {
+    await fetch(`${BASE_URI}/api/v1/detection/map`, {
+      method: 'POST',
+      body: JSON.stringify({
+        location: locationObj,
+      }),
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        setNeighborResult(json.result);
+      });
+  };
+
   return (
     <>
+      {is_detected ? (
+        <AbsoluteView>
+          <Animatable.View
+            animation={heightTranslate}
+            duration={2000}
+            iterationCount={2}
+            direction="alternate"
+            easing={'ease-out-expo'}
+            useNativeDriver={true}
+            style={{
+              width: '90%',
+              height: 50,
+              top: 0,
+              backgroundColor: 'rgba(59,150,96,0.8)',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 30,
+              borderColor: 'rgba(9,9,9,0.2)',
+              borderStyle: 'solid',
+              borderWidth: 1,
+            }}
+          >
+            <MaterialCommunityIcons name="alarm-light-outline" size={26} color="#FFF" />
+            <NotifyText>병해충이 탐지되었습니다.</NotifyText>
+          </Animatable.View>
+        </AbsoluteView>
+      ) : null}
       <LoadingBackground isLoading={!isReady}>
-        <LoadingGIF source={carrotGIF} />
+        <LoadingGIF source={paGIF} />
       </LoadingBackground>
       <Background>
         {isResult ? (
@@ -406,6 +477,7 @@ const DetectPestResult = ({
               onPress={() => {
                 setIsResult(false);
                 getVisual();
+                getNeighborResult();
                 setIsVisual(true);
               }}
             >
@@ -465,48 +537,53 @@ const DetectPestResult = ({
               <MapView
                 style={{ height: PHONE_WIDTH }}
                 userInterfaceStyle="light"
-                // followsUserLocation={true}
                 showsUserLocation={true}
                 rotateEnabled={false}
                 pitchEnabled={false}
+                zoomEnabled={false}
+                zoomTapEnabled={false}
+                scrollEnabled={false}
                 initialRegion={{
                   latitude: latitude,
                   longitude: longitude,
-                  latitudeDelta: 0.005,
-                  longitudeDelta: 0.005,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
                 }}
               >
-                <Marker
-                  coordinate={{ latitude: 37.5873767, longitude: 127.097316501 }}
-                  image={require('../assets/location5.png')}
-                >
-                  <Callout tooltip>
-                    <LocationContainer>
-                      <LocationBubble>
-                        <LocationText>콩 점무늬병</LocationText>
-                        <LocationImage source={require('../assets/cong.jpg')} />
-                      </LocationBubble>
-                      <ArrowBorder></ArrowBorder>
-                      <Arrow></Arrow>
-                    </LocationContainer>
-                  </Callout>
-                </Marker>
-
-                <Marker
-                  coordinate={{ latitude: latitude, longitude: longitude }}
-                  image={require('../assets/location5.png')}
-                >
-                  <Callout tooltip>
-                    <LocationContainer>
-                      <LocationBubble>
-                        <LocationText>콩 점무늬병</LocationText>
-                        <LocationImage source={require('../assets/cong.jpg')} />
-                      </LocationBubble>
-                      <ArrowBorder></ArrowBorder>
-                      <Arrow></Arrow>
-                    </LocationContainer>
-                  </Callout>
-                </Marker>
+                {neighborResult.length !== 0
+                  ? neighborResult.map((data, index) => {
+                      return detection_oid !== data._id ? (
+                        <Marker
+                          key={index}
+                          coordinate={{
+                            longitude: data.location.x,
+                            latitude: data.location.y,
+                          }}
+                          image={require('../assets/location5.png')}
+                        >
+                          <Callout tooltip>
+                            <LocationContainer>
+                              <LocationBubble>
+                                <LocationText>{data.model_result.name}</LocationText>
+                                <LocationImage source={{ uri: data.img }} />
+                              </LocationBubble>
+                              <ArrowBorder></ArrowBorder>
+                              <Arrow></Arrow>
+                            </LocationContainer>
+                          </Callout>
+                        </Marker>
+                      ) : (
+                        <Marker
+                          key={index}
+                          coordinate={{
+                            longitude: data.location.x,
+                            latitude: data.location.y,
+                          }}
+                        />
+                      );
+                    })
+                  : null}
+                <Marker coordinate={{ longitude: longitude, latitude: latitude }} />
               </MapView>
             </>
           ) : null}
