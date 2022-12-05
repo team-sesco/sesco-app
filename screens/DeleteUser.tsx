@@ -34,7 +34,7 @@ const BackBotton = styled.TouchableOpacity`
   margin-bottom: 15px;
 `;
 
-const Container = styled.View<{ statusbarHeight: number }>`
+const Container = styled.View`
   width: 90%;
   margin: 0 auto;
 `;

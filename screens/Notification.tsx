@@ -87,7 +87,7 @@ const Notification = ({
 
     for (const value of times) {
       const betweenTime = Math.floor(diff / value.milliSeconds);
-      //   console.log(diff, value.time);
+
       if (betweenTime > 0) {
         return `${betweenTime}${value.time} 전`;
       }

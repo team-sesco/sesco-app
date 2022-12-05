@@ -5,6 +5,7 @@ import ChatLeftBox from '../components/ChatLeftBox';
 import ChatRightBox from '../components/ChatRightBox';
 import { BarChart } from 'react-native-chart-kit';
 import carrotGIF from '../assets/carrot.gif';
+import paGIF from '../assets/pa.gif';
 import { BASE_URI } from '../api/api';
 import MapView, { Callout, Marker } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -105,10 +106,7 @@ const AskButtonText = styled.Text`
   color: #fff;
 `;
 
-const LocationContainer = styled.View`
-  /* left: 10px;
-  top: 10px; */
-`;
+const LocationContainer = styled.View``;
 const LocationBubble = styled.View`
   flex-direction: column;
   align-items: center;
@@ -419,7 +417,7 @@ const AlreadyDetectPestResult = ({
   return (
     <>
       <LoadingBackground isLoading={!isReady}>
-        <LoadingGIF source={carrotGIF} />
+        <LoadingGIF source={paGIF} />
       </LoadingBackground>
       <Background>
         <TopContainer>
@@ -515,7 +513,6 @@ const AlreadyDetectPestResult = ({
               <MapView
                 style={{ height: PHONE_WIDTH }}
                 userInterfaceStyle="light"
-                // followsUserLocation={true}
                 showsUserLocation={true}
                 rotateEnabled={false}
                 pitchEnabled={false}

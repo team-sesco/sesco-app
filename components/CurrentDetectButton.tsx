@@ -27,9 +27,9 @@ const CropDate = styled.Text`
   color: rgba(0, 0, 0, 0.5);
 `;
 
-const CurrentDetectButton = ({ cropPest, cropLocation, cropDate }) => {
+const CurrentDetectButton = ({ onPress, cropPest, cropLocation, cropDate }) => {
   return (
-    <Container>
+    <Container onPress={onPress}>
       <CropPest>{cropPest}</CropPest>
       <CropLocation>{cropLocation}</CropLocation>
       <CropDate>{cropDate}</CropDate>

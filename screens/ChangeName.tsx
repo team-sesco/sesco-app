@@ -30,11 +30,11 @@ const Background = styled.View`
   background-color: #f7fbf9;
 `;
 
-const BackBotton = styled.TouchableOpacity`
+const BackButton = styled.TouchableOpacity`
   margin-bottom: 15px;
 `;
 
-const Container = styled.View<{ statusbarHeight: number }>`
+const Container = styled.View`
   width: 90%;
   margin: 0 auto;
 `;
@@ -214,10 +214,10 @@ const ChangeName = () => {
         </LoadingBackground>
         <HeadSeparator />
         <Background>
-          <Container showsVerticalScrollIndicator={false}>
-            <BackBotton onPress={goBack}>
+          <Container>
+            <BackButton onPress={goBack}>
               <Ionicons name="chevron-back-outline" size={24} color="black" />
-            </BackBotton>
+            </BackButton>
             <MainTitle text="닉네임 변경" />
             <TitleSeparator />
             <TopView>

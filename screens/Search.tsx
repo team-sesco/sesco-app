@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import HeadSeparator from '../components/HeadSeparator';
 import carrotGIF from '../assets/carrot.gif';
+import paGIF from '../assets/pa.gif';
 import gochuImg from '../assets/gochu.png';
 import muImg from '../assets/mu.png';
 import baechuImg from '../assets/baechu.png';
@@ -160,7 +161,7 @@ const Search = ({
     <TouchableOpacity onPress={Keyboard.dismiss} activeOpacity={1}>
       <>
         <LoadingBackground isLoading={!isReady}>
-          <LoadingGIF source={carrotGIF} />
+          <LoadingGIF source={paGIF} />
         </LoadingBackground>
         <HeadSeparator />
         <Background>

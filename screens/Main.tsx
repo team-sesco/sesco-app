@@ -501,9 +501,9 @@ const Main = () => {
                 bookMarkData.length === 0
                   ? 150
                   : bookMarkData.length === 1
-                  ? 150
+                  ? 120
                   : bookMarkData.length === 2
-                  ? 250
+                  ? 220
                   : 350,
             }}
           >

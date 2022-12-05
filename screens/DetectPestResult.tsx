@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
-import { useNavigation } from '@react-navigation/native';
-import { Dimensions, Platform, StatusBar } from 'react-native';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { Dimensions, Platform, View } from 'react-native';
 import ChatLeftBox from '../components/ChatLeftBox';
 import ChatRightBox from '../components/ChatRightBox';
 import { BarChart } from 'react-native-chart-kit';
 import carrotGIF from '../assets/carrot.gif';
+import paGIF from '../assets/pa.gif';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URI } from '../api/api';
 import MapView, { Callout, Marker } from 'react-native-maps';
@@ -97,10 +96,7 @@ const AskButtonText = styled.Text`
   color: #fff;
 `;
 
-const LocationContainer = styled.View`
-  /* left: 10px;
-  top: 10px; */
-`;
+const LocationContainer = styled.View``;
 const LocationBubble = styled.View`
   flex-direction: column;
   align-items: center;
@@ -123,6 +119,7 @@ const Arrow = styled.View`
   border-color: transparent;
   border-top-color: #fff;
   border-width: 16px;
+  align-self: center;
   margin-top: -32px;
 `;
 const ArrowBorder = styled.View`
@@ -130,6 +127,7 @@ const ArrowBorder = styled.View`
   border-color: transparent;
   border-top-color: #007a87;
   border-width: 16px;
+  align-self: center;
   margin-top: -0.5px;
 `;
 
@@ -175,8 +173,6 @@ const DetectPestResult = ({
   const [isBookMark, setIsBookMark] = useState(false);
   const [isFontSize, setIsFontSize] = useState(false);
   const { width: PHONE_WIDTH } = Dimensions.get('window');
-  const STATUSBAR_HEIGHT =
-    Platform.OS === 'ios' ? getStatusBarHeight(true) : StatusBar.currentHeight;
   const [isResult, setIsResult] = useState(true);
   const [hasVisual, setHasVisual] = useState(false);
   const [isVisual, setIsVisual] = useState(false);
@@ -256,7 +252,6 @@ const DetectPestResult = ({
     ).then((res) => res.json());
 
     if (response.msg === 'success') {
-      console.log(response);
       setVisualUri(response.result.visualization);
       setGraphData({
         labels: response.result.ratio.name,
@@ -279,7 +274,7 @@ const DetectPestResult = ({
         headers: {
           Authorization: `Bearer ${jwtToken}`,
         },
-      }).then((res) => console.log(res.json()));
+      });
 
       tempChatsArr.push({ type: 'human', text: '북마크 해제해주세요!' });
       tempChatsArr.push({ type: 'bot', text: '북마크 해제하였습니다.' });
@@ -424,7 +419,6 @@ const DetectPestResult = ({
       .then((res) => res.json())
       .then((json) => {
         setNeighborResult(json.result);
-        console.log(userLocation);
       });
   };
 
@@ -459,7 +453,7 @@ const DetectPestResult = ({
         </AbsoluteView>
       ) : null}
       <LoadingBackground isLoading={!isReady}>
-        <LoadingGIF source={carrotGIF} />
+        <LoadingGIF source={paGIF} />
       </LoadingBackground>
       <Background>
         {isResult ? (
@@ -543,7 +537,6 @@ const DetectPestResult = ({
               <MapView
                 style={{ height: PHONE_WIDTH }}
                 userInterfaceStyle="light"
-                // followsUserLocation={true}
                 showsUserLocation={true}
                 rotateEnabled={false}
                 pitchEnabled={false}
