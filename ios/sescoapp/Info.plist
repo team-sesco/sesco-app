@@ -33,7 +33,7 @@
 		<string>storykompassauth</string>
 		<string>kakaolink</string>
 		<string>naversearchapp</string>
-  		<string>naversearchthirdlogin</string>
+		<string>naversearchthirdlogin</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -50,6 +50,20 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>SE. SCO needs access to your Camera.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string></string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string></string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>SE. SCO needs access to your Camera.</string>
+	<key>NSPhotoLibraryAppUsageDescription</key>
+	<string>SE. SCO would like to save photos to your photo gallery</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SE. SCO would like access to your photo gallery</string>
 	<key>UILaunchStoryboardName</key>
 	<string>SplashScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -57,7 +71,7 @@
 		<string>armv7</string>
 	</array>
 	<key>UIStatusBarStyle</key>
-	<string></string>
+	<string>UIStatusBarStyleLightContent</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -66,19 +80,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string/>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string/>
-	<key>NSPhotoLibraryUsageDescription</key>
-    <string>SE. SCO would like access to your photo gallery</string>
-    <key>NSPhotoLibraryAppUsageDescription</key>
-    <string>SE. SCO would like to save photos to your photo gallery</string>
-	<key>NSCameraUsageDescription</key>
-	<string>SE. SCO needs access to your Camera.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>SE. SCO needs access to your Camera.</string>
 </dict>
 </plist>
